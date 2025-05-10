@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev": "dotenv -e ../.env -- nodemon src/index.js",
+    "start": "dotenv -e ../.env -- node src/index.js",
+    "test": "dotenv -e ../.env.test -- jest"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
+}
