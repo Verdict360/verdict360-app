@@ -1,0 +1,99 @@
+name: Legal Compliance Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'api/services/legal-document-processor/**'
+      - 'api/services/vector-store/**'
+      - 'docker/postgres/init-scripts/**'
+      - 'web/components/legal-documents/**'
+
+jobs:
+  legal-compliance-check:
+    name: Legal Compliance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check for sensitive legal data
+        run: |
+          echo "Running legal data compliance checks..."
+          # Check for potential identifiable information patterns in code
+          ! grep -r --include="*.{ts,tsx,js,jsx,py,sql}" -E '[0-9]{13}' . # SA ID number pattern
+          ! grep -r --include="*.{ts,tsx,js,jsx,py,sql}" -E '[A-Z]{3}[0-9]{6}' . # Passport pattern
+          ! grep -r --include="*.{ts,tsx,js,jsx,py,sql}" -E 'password|secret|key' --include="*.{json,yml,yaml}" .
+      
+      - name: Check for POPIA compliance markers
+        run: |
+          echo "Checking for POPIA compliance markers..."
+          python << EOF
+          import os
+          import re
+          import sys
+
+          # Files that should have POPIA compliance markers
+          compliance_required_files = [
+              r".*user.*\.py$",
+              r".*profile.*\.py$",
+              r".*document.*\.py$",
+              r".*personal.*\.py$",
+              r".*auth.*\.py$"
+          ]
+
+          compliance_marker = r"# POPIA Compliance: "
+
+          violations = []
+          for root, _, files in os.walk("./api"):
+              for file in files:
+                  if file.endswith(".py"):
+                      filepath = os.path.join(root, file)
+                      for pattern in compliance_required_files:
+                          if re.match(pattern, file):
+                              with open(filepath, 'r') as f:
+                                  content = f.read()
+                                  if compliance_marker not in content:
+                                      violations.append(filepath)
+
+          if violations:
+              print("POPIA compliance markers missing in these files:")
+              for v in violations:
+                  print(f"  - {v}")
+              sys.exit(1)
+          EOF
+      
+      - name: Verify correct legal citation formats
+        run: |
+          echo "Checking South African legal citation formats..."
+          # Check for standard SA case citation formats in legal reference files
+          python << EOF
+          import os
+          import re
+          import sys
+
+          # Regex patterns for South African legal citations
+          sa_citation_patterns = [
+              r'\d{4}\s+\(\d+\)\s+SA\s+\d+\s+\([A-Z]+\)', # 2019 (2) SA 343 (SCA)
+              r'\[\d{4}\]\s+ZACC\s+\d+',                  # [2021] ZACC 13
+              r'\[\d{4}\]\s+ZASCA\s+\d+',                 # [2020] ZASCA 99
+              r'\d{4}\s+\(\d+\)\s+BCLR\s+\d+'             # 2018 (7) BCLR 844
+          ]
+
+          citation_files = []
+          for root, _, files in os.walk("./api/services/legal-document-processor"):
+              for file in files:
+                  if file.endswith(".py"):
+                      filepath = os.path.join(root, file)
+                      with open(filepath, 'r') as f:
+                          content = f.read()
+                          # Files with citation-related functions should have proper formats
+                          if 'citation' in content.lower() and not any(re.search(pattern, content) for pattern in sa_citation_patterns):
+                              citation_files.append(filepath)
+                              
+          if citation_files:
+              print("South African legal citation formats missing in these files:")
+              for f in citation_files:
+                  print(f"  - {f}")
+              sys.exit(1)
+          EOF
