@@ -90,8 +90,6 @@
 
 ```yaml
 # docker-compose.yml for development environment
-version: '3.8'
-
 services:
   # PostgreSQL Database with pgvector
   postgres:

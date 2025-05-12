@@ -667,8 +667,6 @@ async def process_legal_query(
 
 ```yaml
 # docker-compose.production.yml
-version: '3.8'
-
 services:
   # Web Frontend (Next.js)
   frontend:

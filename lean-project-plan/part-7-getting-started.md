@@ -102,8 +102,6 @@ Create a development Docker Compose file to start building with the core service
 ```bash
 # Create docker-compose.yml
 cat > docker-compose.yml << EOF
-version: '3.8'
-
 services:
   # PostgreSQL Database with pgvector
   postgres:
