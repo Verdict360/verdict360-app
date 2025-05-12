@@ -1,0 +1,10 @@
+# Legal document processing code requires legal team review
+/api/services/legal-document-processor/ @legal-team
+/api/services/vector-store/ @legal-team
+
+# Authentication and security requires security team review
+/api/auth/ @security-team
+/web/lib/auth/ @security-team
+
+# Database schema changes require data team review
+/docker/postgres/init-scripts/ @data-team
