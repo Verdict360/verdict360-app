@@ -1,4 +1,4 @@
-// web/components/layout/TopBar.tsx (updated)
+// web/components/layout/TopBar.tsx
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
