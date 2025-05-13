@@ -1,0 +1,35 @@
+name: Legal Workflow Automation
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled]
+  pull_request:
+    types: [opened, labeled, unlabeled]
+
+jobs:
+  legal_workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move legal review items
+        if: contains(github.event.label.name, 'workflow:legal-review-required')
+        uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: Verdict360 Development
+          column: Legal Review
+          repo-token: ${{ secrets.LEGAL_WORKFLOW_TOKEN }}
+
+      - name: Flag POPIA compliance issues
+        if: contains(github.event.label.name, 'workflow:popia-compliance')
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ## POPIA Compliance Check Required
+            
+            This issue has been flagged for POPIA (Protection of Personal Information Act) compliance review.
+            
+            Please ensure the following requirements are met:
+            - [ ] Personal data processing is limited to necessary purposes
+            - [ ] Data retention controls are in place
+            - [ ] User consent mechanisms are properly implemented
+            - [ ] Data subject access rights are supported

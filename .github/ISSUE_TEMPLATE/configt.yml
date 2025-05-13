@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Verdict360 Legal Team
+    url: mailto:legal@verdict360.org
+    about: For urgent legal compliance questions not suited for GitHub issues.
