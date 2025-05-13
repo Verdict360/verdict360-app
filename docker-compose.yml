@@ -25,15 +25,17 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/Verdict360_legal
+      KC_DB_URL: jdbc:postgresql://postgres:5432/Verdict360
       KC_DB_USERNAME: Verdict360
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - '8080:8080'
+    volumes:
+      - ./docker/keycloak/import:/opt/keycloak/data/import
     depends_on:
       postgres:
         condition: service_healthy
-    command: ['start-dev']
+    command: ['start-dev', '--import-realm']
 
   minio:
     image: minio/minio

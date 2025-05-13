@@ -1,0 +1,155 @@
+{
+  "realm": "Verdict360",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "attorney",
+        "description": "Legal professional with full case access"
+      },
+      {
+        "name": "paralegal",
+        "description": "Support staff with limited case editing"
+      },
+      {
+        "name": "staff",
+        "description": "Administrative staff with view-only access"
+      },
+      {
+        "name": "admin",
+        "description": "System administrator"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "Verdict360-web",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "Verdict360-mobile",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": [
+        "verdict360://callback"
+      ],
+      "webOrigins": [],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "Verdict360-api",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "api-secret",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": true,
+      "redirectUris": [
+        "http://localhost:8000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8000"
+      ],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "fullScopeAllowed": true
+    }
+  ],
+  "groups": [
+    {
+      "name": "Attorneys",
+      "path": "/Attorneys",
+      "realmRoles": ["attorney"]
+    },
+    {
+      "name": "Paralegals",
+      "path": "/Paralegals",
+      "realmRoles": ["paralegal"]
+    },
+    {
+      "name": "Staff",
+      "path": "/Staff",
+      "realmRoles": ["staff"]
+    },
+    {
+      "name": "Administrators",
+      "path": "/Administrators",
+      "realmRoles": ["admin"]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@verdict360.org",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "System",
+      "lastName": "Administrator",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": true
+        }
+      ],
+      "realmRoles": ["admin"],
+      "groups": ["/Administrators"]
+    },
+    {
+      "username": "attorney",
+      "email": "attorney@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "Attorney",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": true
+        }
+      ],
+      "realmRoles": ["attorney"],
+      "groups": ["/Attorneys"]
+    },
+    {
+      "username": "paralegal",
+      "email": "paralegal@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "Paralegal",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": true
+        }
+      ],
+      "realmRoles": ["paralegal"],
+      "groups": ["/Paralegals"]
+    }
+  ]
+}

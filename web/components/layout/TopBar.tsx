@@ -1,5 +1,7 @@
+// web/components/layout/TopBar.tsx (updated)
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +21,8 @@ export function TopBar() {
         </div>
         
         <div className="flex items-center gap-4">
+          <ThemeToggle />
+          
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>

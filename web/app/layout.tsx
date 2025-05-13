@@ -1,26 +1,28 @@
-// app/layout.tsx
+// web/app/layout.tsx (updated)
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata: Metadata = {
+  title: "Verdict360 - Legal Intelligence Platform",
+  description: "AI-powered legal intelligence for South African professionals",
+};
+
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="flex h-screen">
-          <Sidebar />
-          <div className="flex flex-col flex-1 overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto p-4">{children}</main>
-          </div>
-        </div>
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

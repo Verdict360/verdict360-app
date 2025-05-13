@@ -1,102 +1,124 @@
+// web/app/page.tsx (updated)
+import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { Gavel, BookOpen, Mic, MessageSquare, Scale } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b">
+        <Container className="flex items-center justify-between h-16">
+          <div className="font-bold text-2xl text-primary">Verdict360</div>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="/features" className="text-muted-foreground hover:text-foreground">Features</Link>
+            <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
+            <Link href="/about" className="text-muted-foreground hover:text-foreground">About</Link>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/login">
+              <Button variant="outline">Log in</Button>
+            </Link>
+            <Link href="/signup">
+              <Button>Sign up</Button>
+            </Link>
+          </div>
+        </Container>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      <main className="flex-1">
+        <section className="py-20 md:py-32">
+          <Container>
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+                South African Legal Intelligence Platform
+              </h1>
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8">
+                Streamline your legal work with AI-powered document analysis, case law research, and legal citations.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg">
+                  Get Started
+                </Button>
+                <Button size="lg" variant="outline">
+                  Book a Demo
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <section className="py-20 bg-muted/30">
+          <Container>
+            <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-card p-6 rounded-lg border flex flex-col items-center text-center">
+                <div className="bg-primary/10 p-3 rounded-full mb-4">
+                  <BookOpen className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-medium mb-2">Legal Document Intelligence</h3>
+                <p className="text-muted-foreground">Extract insights from contracts, judgments, and legal documents with AI assistance.</p>
+              </div>
+              <div className="bg-card p-6 rounded-lg border flex flex-col items-center text-center">
+                <div className="bg-primary/10 p-3 rounded-full mb-4">
+                  <Gavel className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-medium mb-2">South African Case Law</h3>
+                <p className="text-muted-foreground">Access and analyze South African legal precedents with proper citation tracking.</p>
+              </div>
+              <div className="bg-card p-6 rounded-lg border flex flex-col items-center text-center">
+                <div className="bg-primary/10 p-3 rounded-full mb-4">
+                  <Mic className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-medium mb-2">Audio Recording & Transcription</h3>
+                <p className="text-muted-foreground">Record client meetings and court proceedings with automatic transcription.</p>
+              </div>
+            </div>
+          </Container>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="border-t py-12">
+        <Container>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-medium mb-4">Product</h3>
+              <ul className="space-y-2">
+                <li><Link href="/features" className="text-muted-foreground hover:text-foreground">Features</Link></li>
+                <li><Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link></li>
+                <li><Link href="/roadmap" className="text-muted-foreground hover:text-foreground">Roadmap</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-medium mb-4">Resources</h3>
+              <ul className="space-y-2">
+                <li><Link href="/documentation" className="text-muted-foreground hover:text-foreground">Documentation</Link></li>
+                <li><Link href="/guides" className="text-muted-foreground hover:text-foreground">Guides</Link></li>
+                <li><Link href="/api" className="text-muted-foreground hover:text-foreground">API</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-medium mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-muted-foreground hover:text-foreground">About</Link></li>
+                <li><Link href="/blog" className="text-muted-foreground hover:text-foreground">Blog</Link></li>
+                <li><Link href="/contact" className="text-muted-foreground hover:text-foreground">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-medium mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link href="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link></li>
+                <li><Link href="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
+                <li><Link href="/compliance" className="text-muted-foreground hover:text-foreground">POPIA Compliance</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t text-center text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Verdict360. All rights reserved.</p>
+          </div>
+        </Container>
       </footer>
     </div>
   );
