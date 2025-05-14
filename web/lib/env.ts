@@ -29,6 +29,18 @@ export const env = {
     realm: process.env.NEXT_PUBLIC_KEYCLOAK_REALM!,
     clientId: process.env.NEXT_PUBLIC_KEYCLOAK_CLIENT_ID!,
   },
+  minio: {
+    endpoint: process.env.NEXT_PUBLIC_MINIO_ENDPOINT || 'localhost',
+    port: parseInt(process.env.NEXT_PUBLIC_MINIO_PORT || '9000'),
+    useSSL: process.env.NEXT_PUBLIC_MINIO_USE_SSL === 'true',
+    accessKey: process.env.NEXT_PUBLIC_MINIO_ACCESS_KEY || 'minioadmin',
+    secretKey: process.env.NEXT_PUBLIC_MINIO_SECRET_KEY || 'minioadmin',
+    buckets: {
+      documents: process.env.NEXT_PUBLIC_MINIO_BUCKET_DOCUMENTS || 'legal-documents',
+      recordings: process.env.NEXT_PUBLIC_MINIO_BUCKET_RECORDINGS || 'legal-recordings',
+      transcriptions: process.env.NEXT_PUBLIC_MINIO_BUCKET_TRANSCRIPTIONS || 'legal-transcriptions',
+    }
+  },
   defaultCurrency: process.env.NEXT_PUBLIC_DEFAULT_CURRENCY || 'ZAR',
   defaultLocale: process.env.NEXT_PUBLIC_DEFAULT_LOCALE || 'en-ZA',
 };

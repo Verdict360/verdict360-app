@@ -3,7 +3,7 @@ services:
     image: minio/minio
     container_name: Verdict360-minio
     environment:
-      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
       - '9000:9000'
@@ -12,10 +12,29 @@ services:
       - minio_data:/data
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live'\]
       interval: 5s
       timeout: 5s
       retries: 3
+
+  # Create buckets and set policies automatically
+  minio-setup:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb myminio/legal-documents --ignore-existing;
+      mc mb myminio/legal-recordings --ignore-existing;
+      mc mb myminio/legal-transcriptions --ignore-existing;
+      mc mb myminio/user-profiles --ignore-existing;
+      mc mb myminio/matter-resources --ignore-existing;
+      mc mb myminio/legal-templates --ignore-existing;
+      mc anonymous set download myminio/legal-templates;
+      exit 0;
+      "
 
 volumes:
   minio_data:
