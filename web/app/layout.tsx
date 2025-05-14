@@ -1,7 +1,7 @@
-// web/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { AuthWrapper } from "./auth-wrapper";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn(inter.className, "min-h-screen bg-background antialiased")}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <AuthWrapper>{children}</AuthWrapper>
         </ThemeProvider>
       </body>
     </html>
