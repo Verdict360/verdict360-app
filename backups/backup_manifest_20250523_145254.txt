@@ -1,0 +1,14 @@
+Verdict360 Full Backup Manifest
+Generated: Fri May 23 14:52:54 SAST 2025
+Backup Date: 20250523_145254
+
+PostgreSQL Backup:
+No PostgreSQL backup found
+
+MinIO Backup:
+No MinIO backup found
+
+System Information:
+Docker Compose Version: Docker Compose version v2.34.0-desktop.1
+Docker Version: Docker version 28.0.4, build b8034c0
+Host OS: Darwin Thandos-MacBook-Pro.local 24.4.0 Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:46 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T8112 arm64
