@@ -1,14 +1,28 @@
-import { Audio } from 'expo-audio';
-import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
+import * as SecureStore from 'expo-secure-store';
+import { useAuth } from '../auth/AuthProvider';
 
 export default function AudioRecordingScreen() {
+  const { user, logout } = useAuth();
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordings, setRecordings] = useState<string[]>([]);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out? Any recordings not uploaded will remain on this device.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Sign Out', onPress: logout, style: 'destructive' },
+      ]
+    );
+  };
 
   const startRecording = async () => {
     try {
@@ -26,30 +40,10 @@ export default function AudioRecordingScreen() {
       });
 
       // Start recording with high quality settings for legal use
-      const { recording } = await Audio.Recording.createAsync({
-        isMeteringEnabled: true,
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.m4a',
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      
       setRecording(recording);
       setIsRecording(true);
       setRecordingTime(0);
@@ -59,6 +53,7 @@ export default function AudioRecordingScreen() {
         setRecordingTime(prev => prev + 1);
       }, 1000);
       setTimerInterval(timer);
+
     } catch (err) {
       console.error('Failed to start recording', err);
       Alert.alert('Recording Error', 'Failed to start legal recording. Please check your microphone permissions.');
@@ -70,7 +65,7 @@ export default function AudioRecordingScreen() {
 
     try {
       setIsRecording(false);
-
+      
       // Clear timer
       if (timerInterval) {
         clearInterval(timerInterval);
@@ -79,7 +74,7 @@ export default function AudioRecordingScreen() {
 
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-
+      
       if (uri) {
         // Save recording info with legal metadata
         const recordingName = `Legal Recording ${recordings.length + 1}`;
@@ -91,15 +86,19 @@ export default function AudioRecordingScreen() {
           type: 'legal_proceeding',
           quality: 'high',
           fileFormat: 'm4a',
+          recordedBy: user?.email || 'Unknown',
         };
 
         // Store securely on device
         try {
-          await SecureStore.setItemAsync(`recording_${Date.now()}`, JSON.stringify(recordingInfo));
+          await SecureStore.setItemAsync(
+            `recording_${Date.now()}`,
+            JSON.stringify(recordingInfo)
+          );
 
           setRecordings([...recordings, recordingName]);
           Alert.alert(
-            'Recording Saved',
+            'Recording Saved', 
             `Legal recording saved securely: ${recordingName}\nDuration: ${formatTime(recordingTime)}`
           );
         } catch (storageErr) {
@@ -120,7 +119,7 @@ export default function AudioRecordingScreen() {
     const hours = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-
+    
     if (hours > 0) {
       return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
@@ -129,21 +128,36 @@ export default function AudioRecordingScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Verdict360 Legal Recorder</Text>
-      <Text style={styles.subtitle}>Secure Audio Recording for Legal Professionals</Text>
-
+      {/* Header with User Info and Logout */}
+      <View style={styles.headerBar}>
+        <View>
+          <Text style={styles.title}>Verdict360 Legal Recorder</Text>
+          <Text style={styles.userInfo}>Welcome, {user?.name || 'Legal Professional'}</Text>
+        </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+      
       {/* Recording Status */}
       <View style={styles.statusContainer}>
-        <Text style={styles.status}>{isRecording ? '🔴 Recording in Progress...' : '⚪ Ready to Record'}</Text>
+        <Text style={styles.status}>
+          {isRecording ? '🔴 Recording in Progress...' : '⚪ Ready to Record'}
+        </Text>
         <Text style={styles.timer}>{formatTime(recordingTime)}</Text>
-        {isRecording && <Text style={styles.recordingHint}>Tap Stop when finished</Text>}
+        {isRecording && (
+          <Text style={styles.recordingHint}>Tap Stop when finished</Text>
+        )}
       </View>
 
       {/* Record Button */}
       <TouchableOpacity
         style={[styles.recordButton, isRecording && styles.recordingButton]}
-        onPress={isRecording ? stopRecording : startRecording}>
-        <Text style={styles.recordButtonText}>{isRecording ? 'Stop' : 'Record'}</Text>
+        onPress={isRecording ? stopRecording : startRecording}
+      >
+        <Text style={styles.recordButtonText}>
+          {isRecording ? 'Stop' : 'Record'}
+        </Text>
       </TouchableOpacity>
 
       {/* Legal Recording Guidelines */}
@@ -184,18 +198,32 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
+  headerBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 32,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#4F46E5',
-    textAlign: 'center',
     marginBottom: 4,
   },
-  subtitle: {
+  userInfo: {
     fontSize: 14,
     color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 32,
+  },
+  logoutButton: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
   statusContainer: {
     alignItems: 'center',

@@ -10,22 +10,14 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.1.2",
-    "@react-navigation/native": "^7.1.9",
-    "@react-navigation/native-stack": "^7.3.13",
-    "cors": "^2.8.5",
     "expo": "~53.0.9",
-    "expo-audio": "~0.4.5",
+    "expo-av": "^15.1.4",
     "expo-file-system": "^18.1.10",
     "expo-secure-store": "^14.2.3",
     "expo-status-bar": "~2.2.3",
-    "express": "^5.1.0",
-    "minio": "^8.0.5",
-    "multer": "^2.0.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
-    "react-native-app-auth": "^8.0.3",
-    "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.10.0"
+    "react-native-app-auth": "^8.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
