@@ -35,31 +35,3 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
-# Expo
-.expo/
-dist/
-web-build/
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-
-# Environment files
-.env*
-!.env.example
-# Expo
-.expo/
-dist/
-web-build/
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-
-# Environment files
-.env*
-!.env.example
