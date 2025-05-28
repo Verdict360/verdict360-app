@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Audio } from 'expo-av';
+import { AVPlaybackSource } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
 import { useAuth } from '../auth/AuthProvider';
@@ -10,8 +11,24 @@ export default function AudioRecordingScreen() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [recordings, setRecordings] = useState<string[]>([]);
+  const [recordings, setRecordings] = useState<{name: string, key: string, timestamp: string}[]>([]);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
+
+  // Playback state
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentlyPlayingIndex, setCurrentlyPlayingIndex] = useState<number | null>(null);
+  const [playbackPosition, setPlaybackPosition] = useState(0);
+  const [playbackDuration, setPlaybackDuration] = useState(0);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
 
   const handleLogout = () => {
     Alert.alert(
@@ -78,6 +95,7 @@ export default function AudioRecordingScreen() {
       if (uri) {
         // Save recording info with legal metadata
         const recordingName = `Legal Recording ${recordings.length + 1}`;
+        const recordingKey = `recording_${Date.now()}`;
         const recordingInfo = {
           name: recordingName,
           uri: uri,
@@ -92,11 +110,16 @@ export default function AudioRecordingScreen() {
         // Store securely on device
         try {
           await SecureStore.setItemAsync(
-            `recording_${Date.now()}`,
+            recordingKey,
             JSON.stringify(recordingInfo)
           );
 
-          setRecordings([...recordings, recordingName]);
+          setRecordings([...recordings, {
+            name: recordingName,
+            key: recordingKey,
+            timestamp: new Date().toISOString()
+          }]);
+          
           Alert.alert(
             'Recording Saved', 
             `Legal recording saved securely: ${recordingName}\nDuration: ${formatTime(recordingTime)}`
@@ -113,6 +136,84 @@ export default function AudioRecordingScreen() {
       console.error('Failed to stop recording', err);
       Alert.alert('Error', 'Failed to stop recording properly');
     }
+  };
+
+  const playRecording = async (recordingKey: string, index: number) => {
+    try {
+      // Stop any currently playing sound
+      if (sound) {
+        await sound.unloadAsync();
+        setSound(null);
+        setIsPlaying(false);
+      }
+
+      // Get recording info from secure storage
+      const recordingData = await SecureStore.getItemAsync(recordingKey);
+      if (!recordingData) {
+        Alert.alert('Error', 'Recording not found');
+        return;
+      }
+
+      const recordingInfo = JSON.parse(recordingData);
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: recordingInfo.uri } as AVPlaybackSource,
+        { shouldPlay: true }
+      );
+
+      setSound(newSound);
+      setIsPlaying(true);
+      setCurrentlyPlayingIndex(index);
+
+      // Set up playback status updates
+      newSound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded) {
+          setPlaybackPosition(status.positionMillis || 0);
+          setPlaybackDuration(status.durationMillis || 0);
+          
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            setCurrentlyPlayingIndex(null);
+            setPlaybackPosition(0);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Error playing recording:', error);
+      Alert.alert('Playback Error', 'Failed to play recording');
+    }
+  };
+
+  const pausePlayback = async () => {
+    if (sound) {
+      await sound.pauseAsync();
+      setIsPlaying(false);
+    }
+  };
+
+  const resumePlayback = async () => {
+    if (sound) {
+      await sound.playAsync();
+      setIsPlaying(true);
+    }
+  };
+
+  const stopPlayback = async () => {
+    if (sound) {
+      await sound.unloadAsync();
+      setSound(null);
+      setIsPlaying(false);
+      setCurrentlyPlayingIndex(null);
+      setPlaybackPosition(0);
+      setPlaybackDuration(0);
+    }
+  };
+
+  const formatPlaybackTime = (milliseconds: number) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const formatTime = (seconds: number) => {
@@ -176,11 +277,38 @@ export default function AudioRecordingScreen() {
         <Text style={styles.listTitle}>Stored Recordings ({recordings.length})</Text>
         {recordings.map((recording, index) => (
           <View key={index} style={styles.recordingItem}>
-            <Text style={styles.recordingName}>{recording}</Text>
+            <Text style={styles.recordingName}>{recording.name}</Text>
             <Text style={styles.recordingDate}>
-              {new Date().toLocaleDateString('en-ZA')} at {new Date().toLocaleTimeString('en-ZA')}
+              {new Date(recording.timestamp).toLocaleDateString('en-ZA')} at {new Date(recording.timestamp).toLocaleTimeString('en-ZA')}
             </Text>
             <Text style={styles.recordingStatus}>✅ Encrypted & Stored Securely</Text>
+            
+            {/* Playback Controls */}
+            <View style={styles.playbackControls}>
+              {currentlyPlayingIndex === index ? (
+                <View style={styles.activePlayback}>
+                  <TouchableOpacity
+                    style={styles.playButton}
+                    onPress={isPlaying ? pausePlayback : resumePlayback}
+                  >
+                    <Text style={styles.playButtonText}>{isPlaying ? '⏸️' : '▶️'}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.stopButton} onPress={stopPlayback}>
+                    <Text style={styles.stopButtonText}>⏹️</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.playbackTime}>
+                    {formatPlaybackTime(playbackPosition)} / {formatPlaybackTime(playbackDuration)}
+                  </Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.playButton}
+                  onPress={() => playRecording(recording.key, index)}
+                >
+                  <Text style={styles.playButtonText}>▶️ Play</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         ))}
         {recordings.length === 0 && (
@@ -326,6 +454,48 @@ const styles = StyleSheet.create({
     color: '#059669',
     marginTop: 4,
     fontWeight: '500',
+  },
+  playbackControls: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  activePlayback: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  playButton: {
+    backgroundColor: '#4F46E5',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  playButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  stopButton: {
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  stopButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  playbackTime: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: 'monospace',
+    flex: 1,
+    textAlign: 'right',
   },
   noRecordings: {
     textAlign: 'center',
