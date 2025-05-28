@@ -4,13 +4,13 @@
 
 ##### Legal Document Upload & Processing
 
-- [ ] Create drag & drop interface for legal documents
-- [ ] Implement document type validation (statutes, judgments, contracts)
-- [ ] Add progress indicators for uploads with size estimation
-- [ ] Set up direct upload to MinIO storage with client-matter tagging
-- [ ] Handle multiple file uploads with batch processing
-- [ ] Add document validation and error handling
-- [ ] Implement MinIO client for document retrieval
+- [x] Create drag & drop interface for legal documents
+- [x] Implement document type validation (statutes, judgments, contracts)
+- [x] Add progress indicators for uploads with size estimation
+- [x] Set up direct upload to MinIO storage with client-matter tagging
+- [x] Handle multiple file uploads with batch processing
+- [x] Add document validation and error handling
+- [x] Implement MinIO client for document retrieval
 
 ##### Audio Recording Integration (Mobile)
 
@@ -34,10 +34,10 @@
 
 ##### Legal Text Extraction & Citation Detection
 
-- [ ] Implement PDF text extraction with PyPDF2/pdfminer.six
-- [ ] Add DOCX parsing with python-docx
-- [ ] Create TXT file processing with legal structure detection
-- [ ] Implement regex-based citation recognition for South African cases
+- [x] Implement PDF text extraction with PyPDF2/pdfminer.six
+- [x] Add DOCX parsing with python-docx
+- [x] Create TXT file processing with legal structure detection
+- [x] Implement regex-based citation recognition for South African cases
 - [ ] Add South African case law reference detection
 - [ ] Create extraction job queue with background workers
 - [ ] Implement language detection for multilingual support
