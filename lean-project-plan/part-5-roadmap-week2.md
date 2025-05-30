@@ -14,13 +14,13 @@
 
 ##### Audio Recording Integration (Mobile)
 
-- [ ] Implement secure audio recording in React Native
-- [ ] Create recording interface with legal proceeding metadata
-- [ ] Add pause/resume/stop functionality
-- [ ] Implement background recording capability
-- [ ] Create audio review before upload feature
-- [ ] Add upload to MinIO storage when connectivity available
-- [ ] Implement offline storage with sync capabilities
+- [x] Implement secure audio recording in React Native
+- [x] Create recording interface with legal proceeding metadata
+- [x] Add pause/resume/stop functionality
+- [x] Implement background recording capability
+- [x] Create audio review before upload feature
+- [x] Add upload to MinIO storage when connectivity available
+- [x] Implement offline storage with sync capabilities
 
 ##### Python FastAPI Backend Setup
 
@@ -44,13 +44,13 @@
 
 ##### Self-Hosted Whisper Transcription
 
-- [ ] Set up self-hosted Whisper model (CPU version)
-- [ ] Create audio preprocessing pipeline for optimal results
-- [ ] Implement chunking for large audio files
-- [ ] Add automatic language detection
-- [ ] Create asynchronous processing with progress reporting
+- [x] Set up self-hosted Whisper model (CPU version)
+- [x] Create audio preprocessing pipeline for optimal results
+- [x] Implement chunking for large audio files
+- [x] Add automatic language detection
+- [x] Create asynchronous processing with progress reporting
 - [ ] Implement webhook callbacks on completion
-- [ ] Add basic speaker diarization capabilities
+- [x] Add basic speaker diarization capabilities
 
 ##### Vector Processing for Legal Content
 

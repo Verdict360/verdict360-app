@@ -8,7 +8,9 @@ import asyncio
 from app.dependencies import get_current_user
 from app.services.document_processor import DocumentProcessor
 from app.services.minio_service import minio_service
+from app.services.whisper_service import whisper_service
 from app.models.schemas import DocumentCreate, RecordingCreate, LegalQuery, UserResponse
+from app.routers import recordings
 
 # Initialize services
 document_processor = DocumentProcessor()
@@ -21,12 +23,13 @@ async def lifespan(app: FastAPI):
         await minio_service.ensure_buckets_exist()
         print("✅ MinIO storage initialized")
         print("✅ Document processor initialized")
+        print("✅ Whisper transcription service ready")
     except Exception as e:
         print(f"❌ Startup error: {e}")
         print("⚠️  Continuing without MinIO (check your MinIO configuration)")
     yield
     # Shutdown
-    print("�� Shutting down Verdict360 Legal API...")
+    print("🛑 Shutting down Verdict360 Legal API...")
 
 app = FastAPI(
     title="Verdict360 Legal API",
@@ -44,6 +47,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(recordings.router)
+
 # Health check endpoint
 @app.get("/health")
 async def health_check():
@@ -56,7 +62,9 @@ async def health_check():
             "document_processing", 
             "sa_citation_detection", 
             "text_extraction",
-            "minio_storage"
+            "minio_storage",
+            "whisper_transcription",
+            "audio_processing"
         ]
     }
 
@@ -140,9 +148,11 @@ async def test_endpoint():
             "FastAPI", 
             "Document Processing", 
             "SA Citation Detection",
-            "MinIO Storage Integration"
+            "MinIO Storage Integration",
+            "Whisper Audio Transcription",
+            "Legal Audio Processing"
         ],
-        "next_steps": ["Vector search", "Audio transcription", "Database integration"]
+        "next_steps": ["Vector search", "Database integration", "Legal chat with LLMs"]
     }
 
 if __name__ == "__main__":
