@@ -24,12 +24,12 @@
 
 ##### Python FastAPI Backend Setup
 
-- [ ] Set up Python virtual environment with legal NLP packages
-- [ ] Initialize FastAPI project with legal processing endpoints
-- [ ] Create document and audio processing routes
-- [ ] Set up Keycloak client for authentication validation
-- [ ] Implement JWT validation for legal data security
-- [ ] Create Docker configuration for deployment
+- [x] Set up Python virtual environment with legal NLP packages
+- [x] Initialize FastAPI project with legal processing endpoints
+- [x] Create document and audio processing routes
+- [x] Set up Keycloak client for authentication validation
+- [x] Implement JWT validation for legal data security
+- [x] Create Docker configuration for deployment
 - [ ] Configure Ollama integration for LLM access
 
 ##### Legal Text Extraction & Citation Detection
@@ -38,9 +38,9 @@
 - [x] Add DOCX parsing with python-docx
 - [x] Create TXT file processing with legal structure detection
 - [x] Implement regex-based citation recognition for South African cases
-- [ ] Add South African case law reference detection
+- [x] Add South African case law reference detection
 - [ ] Create extraction job queue with background workers
-- [ ] Implement language detection for multilingual support
+- [x] Implement language detection for multilingual support
 
 ##### Self-Hosted Whisper Transcription
 
@@ -67,10 +67,10 @@
 - [ ] Create script for harvesting freely available South African legal documents
 - [ ] Implement citation parser and normalizer
 - [ ] Add document categorization by legal domain
-- [ ] Create storage structure for efficient retrieval
-- [ ] Implement basic search functionality
-- [ ] Add citation validation against curated dataset
-- [ ] Create API for legal document retrieval
+- [x] Create storage structure for efficient retrieval
+- [x] Implement basic search functionality
+- [x] Add citation validation against curated dataset
+- [x] Create API for legal document retrieval
 
 | Task                             | Owner | Status      | Due    |
 | -------------------------------- | ----- | ----------- | ------ |
