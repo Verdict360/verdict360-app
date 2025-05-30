@@ -10,6 +10,7 @@ import aiofiles
 import os
 from langdetect import detect
 from .minio_service import minio_service
+from .vector_store import vector_store
 
 class DocumentProcessor:
     """Document processing service for legal documents with South African legal context"""
@@ -167,9 +168,60 @@ class DocumentProcessor:
             )
         }
     
+    def chunk_document_for_vectors(self, text: str, chunk_size: int = 500, overlap: int = 50) -> List[Dict[str, any]]:
+        """
+        Split document into chunks for vector storage
+        Optimised for legal documents to preserve context
+        """
+        words = text.split()
+        chunks = []
+        
+        for i in range(0, len(words), chunk_size - overlap):
+            chunk_words = words[i:i + chunk_size]
+            chunk_text = " ".join(chunk_words)
+            
+            # Detect citations and legal terms in this chunk
+            chunk_citations = self.detect_sa_legal_citations(chunk_text)
+            legal_terms = self._extract_legal_terms(chunk_text)
+            
+            chunks.append({
+                "content": chunk_text,
+                "start_word": i,
+                "end_word": min(i + chunk_size, len(words)),
+                "word_count": len(chunk_words),
+                "citations": [c["text"] for c in chunk_citations],
+                "legal_terms": legal_terms,
+                "metadata": {
+                    "has_citations": len(chunk_citations) > 0,
+                    "citation_count": len(chunk_citations),
+                    "legal_term_count": len(legal_terms)
+                }
+            })
+        
+        return chunks
+    
+    def _extract_legal_terms(self, text: str) -> List[str]:
+        """Extract common legal terms from text"""
+        legal_terms = [
+            "plaintiff", "defendant", "appellant", "respondent", "magistrate",
+            "judge", "court", "judgment", "order", "injunction", "damages",
+            "contract", "agreement", "breach", "liability", "negligence",
+            "constitutional", "statute", "regulation", "section", "subsection",
+            "advocate", "attorney", "counsel", "chambers", "affidavit"
+        ]
+        
+        found_terms = []
+        text_lower = text.lower()
+        
+        for term in legal_terms:
+            if term in text_lower:
+                found_terms.append(term)
+        
+        return found_terms
+    
     async def process_and_store_document(self, file: UploadFile, metadata: Dict[str, any], user_id: str) -> Dict[str, any]:
         """
-        Process a legal document and store both file and results in MinIO
+        Process a legal document and store both file and results in MinIO + vector store
         """
         document_id = str(uuid.uuid4())
         
@@ -190,6 +242,9 @@ class DocumentProcessor:
             # Analyze document structure
             analysis = self.analyze_document_structure(text)
             
+            # Create chunks for vector storage
+            chunks = self.chunk_document_for_vectors(text)
+            
             # Store original file in MinIO
             file_storage_path = minio_service.upload_document(
                 user_id=user_id,
@@ -197,6 +252,13 @@ class DocumentProcessor:
                 file_content=file_content,
                 filename=file.filename,
                 metadata=metadata
+            )
+            
+            # Add chunks to vector store
+            await vector_store.add_document_chunks(
+                document_id=document_id,
+                chunks=chunks,
+                document_metadata=metadata
             )
             
             # Generate processing summary
@@ -210,10 +272,16 @@ class DocumentProcessor:
                     "storage_path": file_storage_path
                 },
                 "text_length": len(text),
+                "chunk_count": len(chunks),
                 "citations_found": len(citations),
                 "analysis": analysis,
                 "citations": citations,
                 "metadata": metadata,
+                "vector_storage": {
+                    "enabled": True,
+                    "chunks_stored": len(chunks),
+                    "embedding_model": "all-MiniLM-L6-v2"
+                },
                 "status": "completed"
             }
             
