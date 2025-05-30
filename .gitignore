@@ -31,3 +31,68 @@ docker-volumes/
 .next/
 EOF
 node_modules
+
+# Python Backend
+api-python/venv/
+api-python/__pycache__/
+api-python/**/__pycache__/
+api-python/*.egg-info/
+api-python/chroma_db/
+api-python/.chroma/
+api-python/models/
+api-python/logs/
+api-python/*.log
+api-python/test-*.txt
+api-python/test-*.pdf
+api-python/test-*.docx
+
+# Machine Learning Models
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.onnx
+*.pt
+*.pth
+
+# Audio Processing
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.aac
+
+# Test Documents
+test-documents/
+sample-documents/
+temp-uploads/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Vector Database
+chroma_db/
+.chroma/
+chromadb/
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# ChromaDB and Vector stores
+*.index
+*.faiss
+
+# Redis
+dump.rdb
+
+# Whisper models cache
+~/.cache/whisper/
