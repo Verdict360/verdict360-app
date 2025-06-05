@@ -273,3 +273,133 @@ async def test_endpoint():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+
+# NEW: Legal Query with Ollama LLM Integration
+@app.post("/legal-chat")
+async def legal_chat_with_ollama(
+    query: str = Form(...),
+    context_limit: int = Form(3),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """
+    Process legal query using RAG (Retrieval-Augmented Generation) with Ollama
+    
+    This endpoint:
+    1. Searches for relevant documents in your vector store
+    2. Uses those documents as context for Ollama
+    3. Returns a legal response with citations
+    """
+    try:
+        import httpx
+        
+        # Step 1: Retrieve relevant documents from vector store
+        relevant_docs = await vector_store.search_similar_documents(
+            query=query,
+            limit=context_limit,
+            include_metadata=True
+        )
+        
+        # Step 2: Format context from retrieved documents
+        context_parts = []
+        sources = []
+        
+        for i, doc in enumerate(relevant_docs, 1):
+            context_parts.append(f"Document {i}: {doc['content'][:500]}...")
+            sources.append({
+                "document_id": doc.get("metadata", {}).get("document_id", "unknown"),
+                "title": doc.get("metadata", {}).get("title", "Untitled"),
+                "similarity_score": doc["similarity_score"],
+                "citations": doc.get("metadata", {}).get("citations", [])
+            })
+        
+        context = "\n\n".join(context_parts)
+        
+        # Step 3: Create legal prompt for Ollama
+        legal_prompt = f"""You are Verdict360, a specialized South African legal assistant with expertise in South African law.
+
+SOUTH AFRICAN LEGAL CONTEXT:
+- South Africa has a mixed legal system (Roman-Dutch civil law and English common law)
+- The Constitution of the Republic of South Africa (1996) is the supreme law
+- Court hierarchy: Constitutional Court > Supreme Court of Appeal > High Courts > Magistrates' Courts
+- Key legal principles include Ubuntu, constitutional supremacy, and the rule of law
+
+RELEVANT DOCUMENTS FROM DATABASE:
+{context}
+
+QUESTION: {query}
+
+Please provide a comprehensive legal analysis based on the provided context. If the documents contain relevant South African case law or statutes, reference them appropriately. If you cannot answer based on the provided context, clearly state so and suggest what additional information might be needed.
+
+Focus on South African legal principles and cite any case law or statutes mentioned in the context."""
+
+        # Step 4: Query Ollama
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            ollama_response = await client.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "llama3.2",
+                    "prompt": legal_prompt,
+                    "system": "You are a helpful South African legal assistant. Always provide accurate, well-reasoned legal analysis based on South African law.",
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.3,  # Lower temperature for more consistent legal advice
+                        "top_p": 0.9,
+                        "max_tokens": 1000
+                    }
+                }
+            )
+            
+            if ollama_response.status_code != 200:
+                raise HTTPException(status_code=500, detail=f"Ollama service error: {ollama_response.status_code}")
+            
+            ollama_result = ollama_response.json()
+        
+        # Step 5: Format response
+        return {
+            "success": True,
+            "query": query,
+            "response": ollama_result.get("response", "No response generated"),
+            "context_used": {
+                "documents_found": len(relevant_docs),
+                "sources": sources
+            },
+            "model_info": {
+                "model": "llama3.2",
+                "local": True,
+                "temperature": 0.3
+            },
+            "legal_disclaimer": "This is AI-generated legal information for research purposes only. Always consult with a qualified South African attorney for specific legal advice."
+        }
+        
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Ollama service timeout. Please try again.")
+    except httpx.ConnectError:
+        raise HTTPException(status_code=503, detail="Cannot connect to Ollama service. Please ensure Ollama is running.")
+    except Exception as e:
+        print(f"Legal chat error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Legal chat failed: {str(e)}")
+
+# Health check for Ollama integration
+@app.get("/ollama/health")
+async def ollama_health_check():
+    """Check if Ollama service is available and responsive"""
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get("http://localhost:11434/api/tags")
+            
+            if response.status_code == 200:
+                models = response.json().get("models", [])
+                llama_available = any("llama3.2" in model.get("name", "") for model in models)
+                
+                return {
+                    "status": "healthy",
+                    "ollama_running": True,
+                    "llama3.2_available": llama_available,
+                    "total_models": len(models)
+                }
+            else:
+                return {"status": "unhealthy", "error": f"Ollama responded with {response.status_code}"}
+                
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
