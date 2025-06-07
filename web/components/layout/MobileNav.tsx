@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, Book, Gavel, Mic, MessageSquare, Briefcase, User } from "lucide-react";

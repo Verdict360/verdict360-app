@@ -1,3 +1,4 @@
+"use client"
 // web/components/layout/TopBar.tsx
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";

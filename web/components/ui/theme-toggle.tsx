@@ -1,3 +1,4 @@
+"use client"
 // web/components/ui/theme-toggle.tsx
 "use client"
 
