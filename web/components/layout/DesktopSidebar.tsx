@@ -7,7 +7,7 @@ export function DesktopSidebar() {
     { href: "/legal-documents", label: "Documents", icon: Book },
     { href: "/case-law", label: "Case Law", icon: Gavel },
     { href: "/audio-recordings", label: "Recordings", icon: Mic },
-    { href: "/legal-chat", label: "Legal Chat", icon: MessageSquare },
+    { href: "/legal-search", label: "Legal Search", icon: Search },
     { href: "/matters", label: "Matters", icon: Briefcase },
   ];
 
