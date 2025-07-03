@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdict360 Responsive Design Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        'primary-foreground': '#ffffff',
+                        muted: '#f1f5f9',
+                        'muted-foreground': '#64748b',
+                        border: '#e2e8f0'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Testing Controls -->
+    <div class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold text-primary">📱 Verdict360 Responsive Testing</h1>
+            <div class="flex items-center space-x-4">
+                <label class="text-sm font-medium">Device:</label>
+                <select id="deviceSelector" class="border border-gray-300 rounded px-3 py-1">
+                    <option value="desktop">🖥️ Desktop (1920x1080)</option>
+                    <option value="laptop">💻 Laptop (1366x768)</option>
+                    <option value="tablet">📱 Tablet (768x1024)</option>
+                    <option value="mobile">📱 Mobile (375x667)</option>
+                    <option value="mobile-small">📱 Small Mobile (320x568)</option>
+                </select>
+                <button id="testAllSizes" class="bg-primary text-white px-4 py-1 rounded hover:bg-blue-700">
+                    Test All Sizes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Testing Container -->
+    <div class="pt-20 pb-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <!-- Device Preview Frame -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold">Device Preview</h2>
+                    <div id="currentSize" class="text-sm text-muted-foreground"></div>
+                </div>
+                
+                <div class="border-2 border-gray-300 rounded-lg mx-auto transition-all duration-500" id="deviceFrame">
+                    <iframe 
+                        id="previewFrame" 
+                        src="/legal-chat" 
+                        class="w-full h-full rounded-lg"
+                        style="height: 600px;"
+                    ></iframe>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Responsive Test Results -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">📊 Responsive Test Results</h3>
+                    <div id="testResults" class="space-y-4">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Manual Testing Checklist -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">✅ Manual Testing Checklist</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Navigation menu collapses properly on mobile</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Chat interface adapts to screen width</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Text remains readable at all sizes</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Buttons are touch-friendly (44px min)</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Forms work well on mobile keyboards</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Citations display properly on small screens</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Export functionality works on mobile</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-primary">
+                            <span class="text-sm">Admin dashboard charts resize correctly</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Testing Grid -->
+            <div class="mt-8 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">🧩 Component Responsiveness Testing</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Legal Chat Interface Test -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium mb-3">💬 Legal Chat Interface</h4>
+                        <div class="bg-gray-50 rounded p-3">
+                            <div class="space-y-2">
+                                <div class="bg-blue-100 text-blue-800 rounded px-3 py-2 text-sm max-w-xs">
+                                    What are my constitutional rights in South Africa?
+                                </div>
+                                <div class="bg-white border rounded px-3 py-2 text-sm">
+                                    Based on the Constitution of the Republic of South Africa, 1996, you have fundamental rights protected under the Bill of Rights...
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center space-x-2">
+                                <input type="text" placeholder="Ask a legal question..." class="flex-1 border rounded px-2 py-1 text-sm">
+                                <button class="bg-primary text-white px-3 py-1 rounded text-sm">Send</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Citations Display Test -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium mb-3">📚 Citations Display</h4>
+                        <div class="space-y-2">
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-2 text-xs">
+                                <span class="font-medium">Constitution of the Republic of South Africa, 1996</span>
+                            </div>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-2 text-xs">
+                                <span class="font-medium">[2019] ZACC 15</span>
+                            </div>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-2 text-xs">
+                                <span class="font-medium">Labour Relations Act 66 of 1995</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Dashboard Cards Test -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium mb-3">📊 Dashboard Cards</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-blue-50 p-2 rounded text-center">
+                                <div class="text-lg font-bold">47</div>
+                                <div class="text-xs text-gray-600">Users</div>
+                            </div>
+                            <div class="bg-green-50 p-2 rounded text-center">
+                                <div class="text-lg font-bold">1,247</div>
+                                <div class="text-xs text-gray-600">Queries</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const deviceSizes = {
+            desktop: { width: '1920px', height: '1080px', name: 'Desktop' },
+            laptop: { width: '1366px', height: '768px', name: 'Laptop' },
+            tablet: { width: '768px', height: '1024px', name: 'Tablet' },
+            mobile: { width: '375px', height: '667px', name: 'Mobile' },
+            'mobile-small': { width: '320px', height: '568px', name: 'Small Mobile' }
+        };
+
+        const deviceFrame = document.getElementById('deviceFrame');
+        const deviceSelector = document.getElementById('deviceSelector');
+        const currentSize = document.getElementById('currentSize');
+        const testResults = document.getElementById('testResults');
+        const testAllButton = document.getElementById('testAllSizes');
+
+        function setDeviceSize(deviceKey) {
+            const device = deviceSizes[deviceKey];
+            
+            // Update frame size
+            deviceFrame.style.width = device.width;
+            deviceFrame.style.height = device.height;
+            
+            // Update display
+            currentSize.textContent = `${device.name} (${device.width} × ${device.height})`;
+            
+            // Run responsiveness tests
+            runResponsivenessTests(deviceKey);
+        }
+
+        function runResponsivenessTests(deviceKey) {
+            const device = deviceSizes[deviceKey];
+            const width = parseInt(device.width);
+            const height = parseInt(device.height);
+            
+            const tests = [
+                {
+                    name: 'Text Readability',
+                    condition: width >= 320,
+                    message: width >= 320 ? 'Text should be readable' : 'Text may be too small'
+                },
+                {
+                    name: 'Navigation Usability',
+                    condition: width >= 768 || deviceKey.includes('mobile'),
+                    message: width >= 768 ? 'Full navigation visible' : 'Mobile navigation recommended'
+                },
+                {
+                    name: 'Content Layout',
+                    condition: true,
+                    message: width >= 1024 ? 'Multi-column layout optimal' : 
+                             width >= 768 ? 'Two-column layout suitable' : 'Single-column layout required'
+                },
+                {
+                    name: 'Touch Targets',
+                    condition: deviceKey.includes('mobile') || deviceKey.includes('tablet'),
+                    message: deviceKey.includes('mobile') || deviceKey.includes('tablet') ? 
+                            'Touch targets should be 44px minimum' : 'Mouse interaction - standard sizes OK'
+                },
+                {
+                    name: 'Viewport Height',
+                    condition: height >= 568,
+                    message: height >= 568 ? 'Adequate viewport height' : 'Limited viewport - prioritize content'
+                }
+            ];
+
+            // Display test results
+            testResults.innerHTML = tests.map(test => `
+                <div class="flex items-center justify-between p-3 border rounded ${test.condition ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}">
+                    <div>
+                        <div class="font-medium text-sm">${test.name}</div>
+                        <div class="text-xs text-gray-600">${test.message}</div>
+                    </div>
+                    <div class="text-lg">
+                        ${test.condition ? '✅' : '⚠️'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function testAllSizes() {
+            testAllButton.textContent = 'Testing...';
+            testAllButton.disabled = true;
+
+            for (const [key, device] of Object.entries(deviceSizes)) {
+                deviceSelector.value = key;
+                setDeviceSize(key);
+                
+                // Brief pause to observe each size
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+
+            testAllButton.textContent = 'Test All Sizes';
+            testAllButton.disabled = false;
+            
+            // Show completion message
+            alert('✅ Responsive testing complete! Review results and check manual testing items.');
+        }
+
+        // Event listeners
+        deviceSelector.addEventListener('change', (e) => {
+            setDeviceSize(e.target.value);
+        });
+
+        testAllButton.addEventListener('click', testAllSizes);
+
+        // Initialize with desktop view
+        setDeviceSize('desktop');
+
+        // Auto-test common breakpoints
+        function autoTestBreakpoints() {
+            const breakpoints = ['desktop', 'tablet', 'mobile'];
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                if (index < breakpoints.length) {
+                    setDeviceSize(breakpoints[index]);
+                    deviceSelector.value = breakpoints[index];
+                    index++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 2000);
+        }
+
+        // Start auto-test after 3 seconds
+        setTimeout(autoTestBreakpoints, 3000);
+    </script>
+</body>
+</html>

@@ -294,17 +294,19 @@ export default function LegalChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] border rounded-lg shadow-sm">
+    <div className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-12rem)] border rounded-lg shadow-sm">
       {/* Chat Header */}
-      <div className="p-4 border-b flex justify-between items-center bg-card">
-        <div className="flex items-center space-x-3">
-          <Scale className="h-6 w-6 text-primary" />
+      <div className="p-3 md:p-4 border-b flex justify-between items-center bg-card">
+        <div className="flex items-center space-x-2 md:space-x-3">
+          <Scale className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           <div>
-            <h2 className="text-lg font-semibold text-primary">Legal Assistant</h2>
-            <p className="text-xs text-muted-foreground">South African Legal Expertise</p>
+            <h2 className="text-base md:text-lg font-semibold text-primary">Legal Assistant</h2>
+            <p className="text-xs text-muted-foreground hidden sm:block">South African Legal Expertise</p>
           </div>
         </div>
-        <div className="flex space-x-2">
+        
+        {/* Desktop Actions */}
+        <div className="hidden md:flex space-x-2">
           <Button 
             variant="outline" 
             size="sm" 
@@ -337,20 +339,49 @@ export default function LegalChatInterface() {
             New
           </Button>
         </div>
+
+        {/* Mobile Actions Dropdown */}
+        <div className="md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => handleExport('pdf')} disabled={messages.length === 0}>
+                <Download className="h-4 w-4 mr-2" />
+                Export as PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('word')} disabled={messages.length === 0}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export as Word
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={copyFullConversation} disabled={messages.length === 0}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy All
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={newConversation}>
+                <FileText className="h-4 w-4 mr-2" />
+                New Conversation
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-muted/30">
+      <div className="flex-1 p-2 md:p-4 overflow-y-auto space-y-3 md:space-y-4 bg-muted/30">
         {messages.length === 0 ? (
-          <div className="text-center p-8">
-            <Scale className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold mb-2">Welcome to Verdict360 Legal Assistant</h3>
-            <p className="text-muted-foreground mb-6">
+          <div className="text-center p-4 md:p-8">
+            <Scale className="h-12 w-12 md:h-16 md:w-16 mx-auto mb-4 text-muted-foreground/50" />
+            <h3 className="text-base md:text-lg font-semibold mb-2">Welcome to Verdict360 Legal Assistant</h3>
+            <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 px-2">
               Ask questions about South African law, case analysis, or legal research. 
               I'll provide responses with proper legal citations.
             </p>
             
-            <div className="grid gap-2 max-w-md mx-auto">
+            <div className="grid gap-2 max-w-sm md:max-w-md mx-auto">
               <p className="text-sm font-medium text-left mb-2">Try asking about:</p>
               {commonLegalQueries.slice(0, 3).map((query, index) => (
                 <Button
@@ -358,7 +389,7 @@ export default function LegalChatInterface() {
                   variant="outline"
                   size="sm"
                   onClick={() => sendMessage(query)}
-                  className="text-left h-auto p-3 justify-start whitespace-normal"
+                  className="text-left h-auto p-3 justify-start whitespace-normal text-xs md:text-sm"
                   disabled={isProcessing}
                 >
                   {query}
@@ -370,7 +401,7 @@ export default function LegalChatInterface() {
           messages.map(message => (
             <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[85%] rounded-lg p-4 ${
+                className={`max-w-[90%] md:max-w-[85%] rounded-lg p-3 md:p-4 ${
                   message.type === 'user' 
                     ? 'bg-primary text-primary-foreground' 
                     : 'bg-card border shadow-sm'
@@ -485,13 +516,13 @@ export default function LegalChatInterface() {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSubmit} className="p-4 border-t bg-card">
+      <form onSubmit={handleSubmit} className="p-3 md:p-4 border-t bg-card">
         <div className="flex space-x-2">
           <Textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Ask me about South African law, case precedents, statutory interpretation..."
-            className="flex-1 resize-none min-h-[44px] max-h-32"
+            className="flex-1 resize-none min-h-[44px] max-h-32 text-sm md:text-base"
             rows={1}
             disabled={isProcessing}
             onKeyDown={e => {
@@ -505,7 +536,7 @@ export default function LegalChatInterface() {
             type="submit" 
             size="icon" 
             disabled={isProcessing || !input.trim()}
-            className="h-11 w-11"
+            className="h-11 w-11 shrink-0"
           >
             {isProcessing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -515,11 +546,14 @@ export default function LegalChatInterface() {
           </Button>
         </div>
         <div className="mt-2 flex justify-between items-center">
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground hidden sm:block">
             Press Enter to send, Shift+Enter for new line
           </span>
-          <span className="text-xs text-muted-foreground">
-            South African legal expertise " Citations verified
+          <span className="text-xs text-muted-foreground sm:hidden">
+            Tap to send
+          </span>
+          <span className="text-xs text-muted-foreground hidden md:block">
+            South African legal expertise • Citations verified
           </span>
         </div>
       </form>

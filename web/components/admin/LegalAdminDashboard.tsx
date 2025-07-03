@@ -217,18 +217,18 @@ export default function LegalAdminDashboard() {
   const healthStatus = systemStats ? getHealthStatus(systemStats.systemHealth) : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header with refresh */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div className="flex items-center space-x-2">
-          <Scale className="h-6 w-6 text-primary" />
-          <span className="text-lg font-semibold">Legal System Analytics</span>
+          <Scale className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+          <span className="text-base md:text-lg font-semibold">Legal System Analytics</span>
         </div>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <span className="text-xs md:text-sm text-muted-foreground">
             Last updated: {lastRefresh.toLocaleTimeString()}
           </span>
-          <Button variant="outline" onClick={handleRefresh} size="sm">
+          <Button variant="outline" onClick={handleRefresh} size="sm" className="w-fit">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -279,7 +279,7 @@ export default function LegalAdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">System Health</CardTitle>
-            {healthStatus && <healthStatus.icon className={`h-4 w-4 ${healthStatus.color}`} />}
+            {healthStatus && React.createElement(healthStatus.icon, { className: `h-4 w-4 ${healthStatus.color}` })}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold capitalize">{systemStats?.systemHealth}</div>
