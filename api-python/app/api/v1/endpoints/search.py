@@ -10,6 +10,8 @@ import logging
 import re
 from app.models.schemas import LegalQueryRequest, LegalQueryResponse, DocumentSearchRequest
 from app.services.vector_store import VectorStoreService
+from app.services.legal_quality_assurance import qa_service
+from app.services.cache_service import cache_service
 from app.utils.south_african_legal import (
     extract_legal_citations, 
     extract_legal_terms,
@@ -45,6 +47,12 @@ async def process_legal_query(
     """
     try:
         logger.info(f"Processing legal query: {query[:100]}...")
+        
+        # Check cache first
+        cached_response = await cache_service.get_legal_query(query, jurisdiction)
+        if cached_response:
+            logger.info("Returning cached legal query response")
+            return LegalQueryResponse(**cached_response)
         
         # Search for relevant documents using vector similarity
         search_results = await vector_store.search_documents(
@@ -83,16 +91,48 @@ async def process_legal_query(
         # Calculate confidence score based on similarity and citations
         confidence_score = calculate_response_confidence(search_results, citations)
         
-        return LegalQueryResponse(
+        # Perform quality assurance check
+        quality_assessment = await qa_service.assess_legal_response(
+            query=query,
+            response=legal_response,
+            sources=search_results,
+            context_documents=[]
+        )
+        
+        # Add quality metrics to response
+        response_data = LegalQueryResponse(
             success=True,
             response=legal_response,
             sources=sources,
             query=query,
             legal_citations=citations,
             legal_terms=legal_terms[:10],  # Limit to top 10 terms
-            confidence_score=confidence_score,
+            confidence_score=max(confidence_score, quality_assessment.overall_score),  # Use higher score
             jurisdiction=jurisdiction
         )
+        
+        # Add quality assessment metadata if it reveals issues
+        if quality_assessment.overall_score < 0.7:
+            logger.warning(f"Low quality response detected: {quality_assessment.overall_score}")
+            # In production, you might want to regenerate the response or add warnings
+        
+        # Cache the response for future use
+        response_dict = {
+            "success": True,
+            "response": legal_response,
+            "sources": sources,
+            "query": query,
+            "legal_citations": citations,
+            "legal_terms": legal_terms[:10],
+            "confidence_score": max(confidence_score, quality_assessment.overall_score),
+            "jurisdiction": jurisdiction
+        }
+        
+        # Cache only high-quality responses
+        if quality_assessment.overall_score >= 0.7:
+            await cache_service.set_legal_query(query, response_dict, jurisdiction)
+        
+        return response_data
         
     except Exception as e:
         logger.error(f"Error processing legal query: {str(e)}")
@@ -263,6 +303,112 @@ def calculate_response_confidence(search_results: List[Dict[str, Any]], citation
 
 # Global vector store instance (initialized in main.py)
 vector_store_instance = None
+
+@router.post("/quality-assessment")
+async def assess_response_quality(
+    query: str = Form(...),
+    response: str = Form(...),
+    sources: Optional[str] = Form(None)  # JSON string of sources
+):
+    """
+    Endpoint for assessing the quality of a legal response
+    Used by admin dashboard and quality monitoring
+    """
+    try:
+        import json
+        
+        # Parse sources if provided
+        source_list = []
+        if sources:
+            try:
+                source_list = json.loads(sources)
+            except json.JSONDecodeError:
+                logger.warning("Invalid sources JSON provided")
+        
+        # Perform quality assessment
+        assessment = await qa_service.assess_legal_response(
+            query=query,
+            response=response,
+            sources=source_list
+        )
+        
+        return {
+            "success": True,
+            "assessment": {
+                "overall_score": assessment.overall_score,
+                "citation_accuracy": assessment.citation_accuracy,
+                "legal_terminology_score": assessment.legal_terminology_score,
+                "relevance_score": assessment.relevance_score,
+                "confidence_score": assessment.confidence_score,
+                "sa_legal_context_score": assessment.sa_legal_context_score,
+                "quality_level": get_quality_level(assessment.overall_score),
+                "issues": assessment.issues,
+                "recommendations": assessment.recommendations,
+                "validated_citations": assessment.validated_citations,
+                "legal_terms_found": assessment.legal_terms_found
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Quality assessment failed: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Quality assessment failed: {str(e)}"
+        )
+
+def get_quality_level(score: float) -> str:
+    """Get quality level description from score"""
+    if score >= 0.9:
+        return "Excellent"
+    elif score >= 0.8:
+        return "Very Good"
+    elif score >= 0.7:
+        return "Good"
+    elif score >= 0.6:
+        return "Satisfactory"
+    elif score >= 0.5:
+        return "Needs Improvement"
+    else:
+        return "Poor"
+
+@router.get("/cache-stats")
+async def get_cache_statistics():
+    """Get cache performance statistics for admin dashboard"""
+    try:
+        stats = cache_service.get_cache_stats()
+        return {
+            "success": True,
+            "cache_stats": stats
+        }
+    except Exception as e:
+        logger.error(f"Failed to get cache stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/cache-optimize")
+async def optimize_cache():
+    """Optimize cache by removing expired entries"""
+    try:
+        optimization_result = await cache_service.optimize_cache()
+        return {
+            "success": True,
+            "optimization_result": optimization_result
+        }
+    except Exception as e:
+        logger.error(f"Cache optimization failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/cache-clear")
+async def clear_cache(cache_type: Optional[str] = None):
+    """Clear cache entries (optionally by type)"""
+    try:
+        clear_result = await cache_service.clear_cache(cache_type)
+        return {
+            "success": True,
+            "clear_result": clear_result
+        }
+    except Exception as e:
+        logger.error(f"Cache clearing failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 def set_vector_store(store: VectorStoreService):
     global vector_store_instance

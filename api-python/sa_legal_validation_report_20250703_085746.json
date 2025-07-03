@@ -1,0 +1,213 @@
+{
+  "test_timestamp": "2025-07-03T08:57:46.967768",
+  "validation_summary": {
+    "total_tests": 6,
+    "passed_tests": 5,
+    "pass_rate_percentage": 83.3,
+    "average_quality_score": 0.856,
+    "average_response_time": 0.001,
+    "performance_grade": "B",
+    "total_citations_extracted": 15,
+    "total_legal_terms_extracted": 33
+  },
+  "detailed_results": [
+    {
+      "scenario_id": "constitutional_rights_1",
+      "category": "Constitutional Law",
+      "description": "Basic constitutional rights inquiry",
+      "query": "What are my constitutional rights to freedom of expression in South Africa?",
+      "response_time_seconds": 0.001,
+      "response_length": 824,
+      "citations_found": [
+        "2020 (3) SA 245 (SCA)",
+        "[2019] ZACC 15",
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 3,
+      "legal_terms_found": [
+        "constitution",
+        "constitutional court",
+        "supreme court of appeal",
+        "bill of rights",
+        "ubuntu",
+        "jurisprudence"
+      ],
+      "legal_terms_count": 6,
+      "quality_scores": {
+        "overall_score": 0.946,
+        "citation_accuracy": 0.9,
+        "terminology_score": 1.0,
+        "sa_context_score": 1.0,
+        "relevance_score": 0.883
+      },
+      "passed": true,
+      "issues": []
+    },
+    {
+      "scenario_id": "labour_dispute_1",
+      "category": "Labour Law",
+      "description": "Unfair dismissal procedure",
+      "query": "How do I challenge an unfair dismissal in South Africa?",
+      "response_time_seconds": 0.0,
+      "response_length": 747,
+      "citations_found": [
+        "Act 66 of 1995",
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 2,
+      "legal_terms_found": [
+        "constitution",
+        "constitutional court",
+        "labour relations act",
+        "jurisdiction"
+      ],
+      "legal_terms_count": 4,
+      "quality_scores": {
+        "overall_score": 0.72,
+        "citation_accuracy": 0.7,
+        "terminology_score": 0.8,
+        "sa_context_score": 0.7,
+        "relevance_score": 0.7
+      },
+      "passed": false,
+      "issues": [
+        "Quality score below threshold",
+        "Insufficient citations or legal terms"
+      ]
+    },
+    {
+      "scenario_id": "contract_validity_1",
+      "category": "Contract Law",
+      "description": "Contract formation requirements",
+      "query": "What makes a contract legally binding under South African law?",
+      "response_time_seconds": 0.0,
+      "response_length": 782,
+      "citations_found": [
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 1,
+      "legal_terms_found": [
+        "constitution",
+        "supreme court of appeal",
+        "roman-dutch law",
+        "common law",
+        "bill of rights"
+      ],
+      "legal_terms_count": 5,
+      "quality_scores": {
+        "overall_score": 0.745,
+        "citation_accuracy": 0.5,
+        "terminology_score": 0.9,
+        "sa_context_score": 0.8,
+        "relevance_score": 0.8
+      },
+      "passed": true,
+      "issues": []
+    },
+    {
+      "scenario_id": "criminal_procedure_1",
+      "category": "Criminal Law",
+      "description": "Bail application process",
+      "query": "How do I apply for bail under South African criminal procedure?",
+      "response_time_seconds": 0.001,
+      "response_length": 824,
+      "citations_found": [
+        "2020 (3) SA 245 (SCA)",
+        "[2019] ZACC 15",
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 3,
+      "legal_terms_found": [
+        "constitution",
+        "constitutional court",
+        "supreme court of appeal",
+        "bill of rights",
+        "ubuntu",
+        "jurisprudence"
+      ],
+      "legal_terms_count": 6,
+      "quality_scores": {
+        "overall_score": 0.891,
+        "citation_accuracy": 0.9,
+        "terminology_score": 1.0,
+        "sa_context_score": 1.0,
+        "relevance_score": 0.664
+      },
+      "passed": true,
+      "issues": []
+    },
+    {
+      "scenario_id": "property_transfer_1",
+      "category": "Property Law",
+      "description": "Property transfer requirements",
+      "query": "What are the legal requirements for transferring property in South Africa?",
+      "response_time_seconds": 0.001,
+      "response_length": 824,
+      "citations_found": [
+        "2020 (3) SA 245 (SCA)",
+        "[2019] ZACC 15",
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 3,
+      "legal_terms_found": [
+        "constitution",
+        "constitutional court",
+        "supreme court of appeal",
+        "bill of rights",
+        "ubuntu",
+        "jurisprudence"
+      ],
+      "legal_terms_count": 6,
+      "quality_scores": {
+        "overall_score": 0.959,
+        "citation_accuracy": 0.9,
+        "terminology_score": 1.0,
+        "sa_context_score": 1.0,
+        "relevance_score": 0.936
+      },
+      "passed": true,
+      "issues": []
+    },
+    {
+      "scenario_id": "company_registration_1",
+      "category": "Company Law",
+      "description": "Company registration process",
+      "query": "How do I register a private company in South Africa?",
+      "response_time_seconds": 0.001,
+      "response_length": 824,
+      "citations_found": [
+        "2020 (3) SA 245 (SCA)",
+        "[2019] ZACC 15",
+        "Constitution of the Republic of South Africa, 1996"
+      ],
+      "citations_count": 3,
+      "legal_terms_found": [
+        "constitution",
+        "constitutional court",
+        "supreme court of appeal",
+        "bill of rights",
+        "ubuntu",
+        "jurisprudence"
+      ],
+      "legal_terms_count": 6,
+      "quality_scores": {
+        "overall_score": 0.875,
+        "citation_accuracy": 0.9,
+        "terminology_score": 1.0,
+        "sa_context_score": 1.0,
+        "relevance_score": 0.6
+      },
+      "passed": true,
+      "issues": []
+    }
+  ],
+  "system_assessment": {
+    "citation_extraction": "\u2705 Working",
+    "legal_terminology": "\u2705 Working",
+    "sa_legal_context": "\u2705 Working",
+    "response_generation": "\u2705 Working"
+  },
+  "recommendations": [
+    "Address failing test scenarios before production deployment"
+  ]
+}
