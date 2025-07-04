@@ -1,7 +1,7 @@
 "use client"
 
 // Simple toast hook implementation
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export interface Toast {
   id: string;
@@ -49,7 +49,7 @@ export const useToast = () => {
     return addToast(props);
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     listeners.push(setToastList);
     return () => {
       const index = listeners.indexOf(setToastList);
@@ -57,7 +57,7 @@ export const useToast = () => {
         listeners.splice(index, 1);
       }
     };
-  });
+  }, []);
 
   return {
     toast,
