@@ -12,7 +12,8 @@ import {
   Settings, 
   User,
   Scale,
-  BarChart3
+  BarChart3,
+  MessageSquare
 } from 'lucide-react';
 
 const navigationItems = [
@@ -22,9 +23,9 @@ const navigationItems = [
     icon: Home,
   },
   {
-    title: 'Upload Document',
-    href: '/upload',
-    icon: Upload,
+    title: 'Legal Documents',
+    href: '/legal-documents',
+    icon: FileText,
   },
   {
     title: 'Legal Search',
@@ -32,19 +33,19 @@ const navigationItems = [
     icon: Search,
   },
   {
+    title: 'Legal Chat',
+    href: '/legal-chat',
+    icon: MessageSquare,
+  },
+  {
+    title: 'Upload Document',
+    href: '/upload',
+    icon: Upload,
+  },
+  {
     title: 'Record Audio',
     href: '/record',
     icon: Mic,
-  },
-  {
-    title: 'Documents',
-    href: '/documents',
-    icon: FileText,
-  },
-  {
-    title: 'Analytics',
-    href: '/analytics',
-    icon: BarChart3,
   },
 ];
 

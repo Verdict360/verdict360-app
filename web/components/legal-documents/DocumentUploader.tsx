@@ -47,6 +47,17 @@ export function DocumentUploader({ matterId, onDocumentUploaded }: DocumentUploa
   const [submitting, setSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
+  // Helper functions to get display labels
+  const getDocumentTypeLabel = (value: string) => {
+    const type = documentTypes.find(t => t.value === value);
+    return type ? type.label : value;
+  };
+
+  const getJurisdictionLabel = (value: string) => {
+    const jurisdiction = jurisdictions.find(j => j.value === value);
+    return jurisdiction ? jurisdiction.label : value;
+  };
+
   const handleFileUploaded = (fileInfo: { name: string; size: number; path: string }) => {
     setUploadedFile(fileInfo);
   };
@@ -122,7 +133,10 @@ export function DocumentUploader({ matterId, onDocumentUploaded }: DocumentUploa
             disabled={submitting || isComplete}
           >
             <SelectTrigger id="documentType">
-              <SelectValue placeholder="Select document type" />
+              <SelectValue 
+                placeholder="Select document type"
+                selectedValue={documentType ? getDocumentTypeLabel(documentType) : ''}
+              />
             </SelectTrigger>
             <SelectContent>
               {documentTypes.map(type => (
@@ -142,7 +156,10 @@ export function DocumentUploader({ matterId, onDocumentUploaded }: DocumentUploa
             disabled={submitting || isComplete}
           >
             <SelectTrigger id="jurisdiction">
-              <SelectValue placeholder="Select jurisdiction" />
+              <SelectValue 
+                placeholder="Select jurisdiction"
+                selectedValue={jurisdiction ? getJurisdictionLabel(jurisdiction) : ''}
+              />
             </SelectTrigger>
             <SelectContent>
               {jurisdictions.map(j => (

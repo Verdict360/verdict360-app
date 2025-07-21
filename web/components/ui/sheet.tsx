@@ -19,15 +19,27 @@ export const Sheet = ({ children, open, onOpenChange }: {
   )
 }
 
-export const SheetTrigger = ({ className, children, onOpenChange, ...props }: any) => (
-  <button
-    className={cn("", className)}
-    onClick={() => onOpenChange?.(true)}
-    {...props}
-  >
-    {children}
-  </button>
-)
+export const SheetTrigger = ({ className, children, onOpenChange, asChild = false, open, ...props }: any) => {
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      ...children.props,
+      onClick: (e: any) => {
+        children.props.onClick?.(e);
+        onOpenChange?.(true);
+      }
+    });
+  }
+  
+  return (
+    <button
+      className={cn("", className)}
+      onClick={() => onOpenChange?.(true)}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
 
 export const SheetContent = ({ className, children, open, onOpenChange, side = "left", ...props }: any) => (
   open ? (

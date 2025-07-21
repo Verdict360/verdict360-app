@@ -12,6 +12,11 @@ export const Select = ({ children, value, onValueChange }: {
   const [isOpen, setIsOpen] = React.useState(false)
   const [selectedValue, setSelectedValue] = React.useState(value || "")
 
+  // Sync internal state with external value prop
+  React.useEffect(() => {
+    setSelectedValue(value || "")
+  }, [value])
+
   const handleValueChange = (newValue: string) => {
     setSelectedValue(newValue)
     onValueChange?.(newValue)
@@ -34,11 +39,11 @@ export const Select = ({ children, value, onValueChange }: {
   )
 }
 
-export const SelectValue = ({ placeholder }: { placeholder?: string }) => (
-  <span className="text-sm">{placeholder}</span>
+export const SelectValue = ({ placeholder, selectedValue }: { placeholder?: string, selectedValue?: string }) => (
+  <span className="text-sm">{selectedValue || placeholder}</span>
 )
 
-export const SelectTrigger = ({ className, children, isOpen, setIsOpen, ...props }: any) => (
+export const SelectTrigger = ({ className, children, isOpen, setIsOpen, selectedValue, onValueChange, disabled, ...otherProps }: any) => (
   <button
     type="button"
     className={cn(
@@ -46,39 +51,58 @@ export const SelectTrigger = ({ className, children, isOpen, setIsOpen, ...props
       className
     )}
     onClick={() => setIsOpen?.(!isOpen)}
-    {...props}
+    disabled={disabled}
   >
-    {children}
+    {React.Children.map(children, child => 
+      React.isValidElement(child) 
+        ? React.cloneElement(child as React.ReactElement, { selectedValue })
+        : child
+    )}
     <ChevronDown className="h-4 w-4 opacity-50" />
   </button>
 )
 
-export const SelectContent = ({ className, children, isOpen, ...props }: any) => (
+export const SelectContent = ({ className, children, isOpen, selectedValue, setIsOpen, onValueChange, ...otherProps }: any) => (
   isOpen ? (
     <div
       className={cn(
         "absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-60 overflow-auto",
         className
       )}
-      {...props}
     >
-      {children}
+      {React.Children.map(children, child => 
+        React.isValidElement(child) 
+          ? React.cloneElement(child as React.ReactElement, { 
+              selectedValue, 
+              onValueChange,
+              isOpen,
+              setIsOpen
+            })
+          : child
+      )}
     </div>
   ) : null
 )
 
-export const SelectItem = ({ className, children, value, onValueChange, ...props }: any) => (
-  <div
-    className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm py-2 px-3 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
-      className
-    )}
-    onClick={() => onValueChange?.(value)}
-    {...props}
-  >
-    {children}
-  </div>
-)
+export const SelectItem = ({ className, children, value, onValueChange, selectedValue, isOpen, setIsOpen, ...otherProps }: any) => {
+  const isSelected = selectedValue === value;
+  
+  return (
+    <div
+      className={cn(
+        "relative flex cursor-pointer select-none items-center rounded-sm py-2 px-3 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
+        isSelected && "bg-accent text-accent-foreground",
+        className
+      )}
+      onClick={() => {
+        console.log('SelectItem clicked:', value); // Debug log
+        onValueChange?.(value);
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export const SelectGroup = ({ children }: { children: React.ReactNode }) => (
   <div>{children}</div>
