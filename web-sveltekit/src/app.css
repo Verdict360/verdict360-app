@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply text-legal-gray-900 bg-legal-gray-50;
+  }
+}
+
+@layer components {
+  /* Legal Professional Button Styles */
+  .btn-legal-primary {
+    @apply bg-legal-primary hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-legal transition-colors duration-200;
+  }
+  
+  .btn-legal-secondary {
+    @apply bg-legal-gray-200 hover:bg-legal-gray-300 text-legal-gray-800 font-medium py-2 px-4 rounded-legal transition-colors duration-200;
+  }
+  
+  .btn-legal-accent {
+    @apply bg-legal-accent hover:bg-violet-600 text-white font-medium py-2 px-4 rounded-legal transition-colors duration-200;
+  }
+
+  /* Legal Card Styles */
+  .card-legal {
+    @apply bg-white border border-legal-gray-200 rounded-legal shadow-legal;
+  }
+
+  /* Legal Form Styles */  
+  .input-legal {
+    @apply block w-full rounded-legal border-legal-gray-300 shadow-sm focus:border-legal-primary focus:ring-legal-primary;
+  }
+
+  .textarea-legal {
+    @apply block w-full rounded-legal border-legal-gray-300 shadow-sm focus:border-legal-primary focus:ring-legal-primary;
+  }
+
+  /* Professional Legal Layout */
+  .legal-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .legal-grid {
+    @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  /* Legal Chat Styles */
+  .chat-bubble-user {
+    @apply bg-legal-primary text-white rounded-2xl px-4 py-2 max-w-xs ml-auto;
+  }
+
+  .chat-bubble-assistant {
+    @apply bg-white border border-legal-gray-200 rounded-2xl px-4 py-2 max-w-sm;
+  }
+}
+
+@layer utilities {
+  .legal-text-gradient {
+    @apply bg-gradient-to-r from-legal-primary to-legal-accent bg-clip-text text-transparent;
+  }
+}
