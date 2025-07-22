@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from '@/lib/utils';
-  
+
   export let type: 'text' | 'email' | 'password' | 'tel' | 'url' = 'text';
   export let value = '';
   export let placeholder = '';
@@ -20,10 +20,9 @@
       {/if}
     </label>
   {/if}
-  
+
   <input
     {id}
-    {type}
     {placeholder}
     {disabled}
     {required}
@@ -38,7 +37,7 @@
     on:focus
     on:blur
   />
-  
+
   {#if error}
     <p class="text-sm text-legal-error">{error}</p>
   {/if}

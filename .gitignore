@@ -29,8 +29,14 @@ docker-volumes/
 
 # Next.js build output
 .next/
-EOF
-node_modules
+
+# SvelteKit build artifacts
+web-sveltekit/.svelte-kit/
+web-sveltekit/build/
+web-sveltekit/dist/
+
+# Node modules
+node_modules/
 
 # Python Backend
 api-python/venv/
