@@ -31,9 +31,9 @@ docker-volumes/
 .next/
 
 # SvelteKit build artifacts
-web-sveltekit/.svelte-kit/
-web-sveltekit/build/
-web-sveltekit/dist/
+web/.svelte-kit/
+web/build/
+web/dist/
 .svelte-kit/
 /build
 .output
