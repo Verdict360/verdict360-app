@@ -2,11 +2,11 @@
 
 ## 🏛️ PROJECT OVERVIEW
 
-**Verdict360 AI Legal Chatbot Platform** - A comprehensive SaaS solution for South African law firms providing AI-powered client engagement through web chat widgets, voice calls, consultation booking, and legal knowledge integration.
+**Verdict360 AI Legal Chatbot Platform** - A comprehensive SaaS solution for law firms providing AI-powered client engagement through web chat widgets, voice calls, consultation booking, and comprehensive legal knowledge integration.
 
 ### Key Business Metrics
-- **Target Revenue**: R5,000-R10,000 monthly subscriptions
-- **Market Size**: 81+ qualified SA law firms
+- **Target Revenue**: $1,000-$2,000 monthly subscriptions per firm
+- **Primary Market**: Law firms seeking AI-powered client engagement
 - **ROI Potential**: 300-1,500% proven returns
 - **Timeline**: 4-6 weeks to market-ready platform
 

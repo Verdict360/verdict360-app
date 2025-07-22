@@ -2,7 +2,7 @@
 
 ## 🚀 Quick Start
 
-The Verdict360 Legal Chatbot Widget can be integrated into any law firm website with just **one line of code**. It provides instant South African legal assistance to your website visitors.
+The Verdict360 Legal Chatbot Widget can be integrated into any law firm website with just **one line of code**. It provides instant professional legal assistance to your website visitors.
 
 ### ✅ **Widget is Ready NOW** - No Dependencies!
 
@@ -53,6 +53,10 @@ The widget works **independently** of other project components. You can deploy i
         data-auto-embed="true"
         data-firm-name="Smith & Associates"
         data-firm-logo="https://yourfirm.com/logo.png"
+        data-firm-phone="+27 11 123 4567"
+        data-firm-email="info@smithlaw.co.za"
+        data-emergency-phone="+27 82 911 5555"
+        data-office-hours="Monday - Friday: 8:00 AM - 5:00 PM"
         data-color="#1a365d"
         data-theme="light"></script>
 ```
@@ -71,6 +75,10 @@ The widget works **independently** of other project components. You can deploy i
 - `data-color`: Any hex color code
 - `data-firm-name`: Your law firm's name
 - `data-firm-logo`: URL to your firm's logo
+- `data-firm-phone`: Law firm's main phone number
+- `data-firm-email`: Law firm's email address
+- `data-emergency-phone`: Emergency/after-hours contact number
+- `data-office-hours`: Business hours (e.g., "Monday - Friday: 8:00 AM - 5:00 PM")
 - `data-voice-call`: `true`/`false` (enable voice calling)
 - `data-consultation`: `true`/`false` (enable consultation booking)
 
@@ -84,11 +92,11 @@ The widget automatically adapts to different screen sizes:
 ## 🎯 **Features**
 
 ### Core Legal AI Features ✅
-- **South African legal context** - Trained on SA law
-- **Legal area classification** - Criminal, Family, Commercial, etc.
+- **Professional legal knowledge** - Trained on comprehensive legal information
+- **Legal area classification** - Criminal, Family, Commercial, Civil, Property, Employment
 - **Urgency assessment** - Critical, High, Normal
-- **Citation extraction** - ZACC, ZASCA, High Court cases
-- **Multilingual support** - English (SA English optimized)
+- **Legal citation recognition** - Court cases and statutory references
+- **Multilingual support** - English language optimized for legal terminology
 
 ### Advanced Features ✅
 - **Voice consultations** - Click-to-call functionality
@@ -108,7 +116,7 @@ open test-widget-integration.html
 ### 2. Live Demo Questions
 Try asking these questions to test the AI:
 - "I need help with a criminal case"
-- "How do I file for divorce in South Africa?"
+- "How do I file for divorce?"
 - "What are my rights during arrest?"
 - "I want to book a consultation"
 - "This is an emergency legal matter"
@@ -187,6 +195,52 @@ https://dashboard.verdict360.com/analytics
 - **Anonymized tracking** - Client privacy protected
 - **Secure communications** - HTTPS only
 - **Local data storage** - Minimal browser storage
+
+## 🆘 **Enhanced Error Handling**
+
+### Smart Error Messages
+The widget now provides intelligent error messages with your firm's contact information when the chat service is unavailable:
+
+```html
+<!-- Configure contact information for error messages -->
+<script src="https://verdict360.com/verdict360-widget.js" 
+        data-auto-embed="true"
+        data-firm-name="Your Law Firm"
+        data-firm-phone="+27 11 123 4567"
+        data-firm-email="info@yourfirm.co.za"
+        data-emergency-phone="+27 82 911 5555"
+        data-office-hours="Monday - Friday: 8:00 AM - 5:00 PM"></script>
+```
+
+### Error Message Types
+
+**Technical Difficulties:**
+> "I apologize, but I'm currently experiencing technical difficulties. Please try again in a moment, or contact [Your Firm] directly:
+> 
+> **Contact us directly:**  
+> 📞 **Phone:** +27 11 123 4567  
+> 📧 **Email:** info@yourfirm.co.za  
+> ⏰ **Office Hours:** Monday - Friday: 8:00 AM - 5:00 PM"
+
+**Urgent Legal Matters:**
+When users mention "emergency" or "urgent", the widget shows emergency contact information:
+> "I apologize, but I'm currently experiencing technical difficulties. For urgent legal matters, please contact us directly:
+> 
+> **Contact us directly:**  
+> 📞 **Phone:** +27 11 123 4567  
+> 📧 **Email:** info@yourfirm.co.za  
+> 🚨 **Emergency:** +27 82 911 5555  
+> ⏰ **Office Hours:** Monday - Friday: 8:00 AM - 5:00 PM"
+
+**Connection Issues:**
+> "I'm having trouble connecting to our legal database. Please try again in a moment, or contact our office directly: [contact information]"
+
+### Benefits
+- **No lost leads** - Clients always have a way to contact you
+- **Professional appearance** - Branded contact information
+- **Emergency handling** - Special handling for urgent legal matters
+- **Clickable contacts** - Phone numbers and emails are clickable links
+- **Context-aware** - Different messages for different situations
 
 ## 🚀 **Deployment Steps**
 
@@ -269,4 +323,4 @@ Start with the simple one-line integration above! 🚀
 ---
 
 **Verdict360 AI Legal Platform**  
-*Empowering South African law firms with intelligent client engagement*
+*Empowering law firms worldwide with intelligent client engagement*

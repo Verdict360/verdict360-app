@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Error Handling Test - Verdict360 Widget</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f8fafc;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        .test-button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 10px 10px 0;
+            transition: background 0.2s;
+        }
+        
+        .test-button:hover {
+            background: #357abd;
+        }
+        
+        .test-button.urgent {
+            background: #e53e3e;
+        }
+        
+        .test-button.urgent:hover {
+            background: #c53030;
+        }
+        
+        .instructions {
+            background: #edf2f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .feature-list li:before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🆘 Enhanced Error Handling Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test Instructions</h2>
+        <div class="instructions">
+            <p><strong>This page demonstrates the enhanced error handling features of the Verdict360 widget.</strong></p>
+            <p>Since the backend API is not running, all messages will trigger error responses. This allows us to test the different types of error messages with contact information.</p>
+        </div>
+        
+        <h3>🧪 Test Scenarios</h3>
+        <p>Click the buttons below to simulate different types of error scenarios:</p>
+        
+        <button class="test-button" onclick="testNormalError()">Normal Error</button>
+        <button class="test-button urgent" onclick="testUrgentError()">Emergency Error</button>
+        <button class="test-button" onclick="testConnectionError()">Connection Error</button>
+        <button class="test-button" onclick="openWidget()">Open Widget Manually</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Widget Configuration</h2>
+        <p>The widget on this page is configured with the following contact information:</p>
+        
+        <div class="code">
+data-firm-name="Smith & Associates Attorneys"
+data-firm-phone="+27 11 123 4567"
+data-firm-email="info@smithlaw.co.za"
+data-emergency-phone="+27 82 911 5555"
+data-office-hours="Monday - Friday: 8:00 AM - 5:00 PM, Saturday: 9:00 AM - 1:00 PM"
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>✨ Enhanced Features</h2>
+        <ul class="feature-list">
+            <li>Smart error messages with firm contact information</li>
+            <li>Context-aware emergency contact display</li>
+            <li>Clickable phone numbers and email addresses</li>
+            <li>Professional office hours display</li>
+            <li>Different messages for different error types</li>
+            <li>No lost leads - clients always have contact options</li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 Expected Behavior</h2>
+        <p><strong>Normal Error:</strong> Shows standard error message with phone, email, and office hours.</p>
+        <p><strong>Emergency Error:</strong> Shows emergency contact number in addition to standard contact info.</p>
+        <p><strong>Connection Error:</strong> Shows specific connection-related error message with contact details.</p>
+        <p><strong>Manual Open:</strong> Opens the widget interface without sending a message.</p>
+    </div>
+
+    <!-- Enhanced Verdict360 Widget with Contact Information -->
+    <script>
+        // Load the widget script with full contact configuration
+        const widgetScript = document.createElement('script');
+        widgetScript.src = './web/static/verdict360-widget.js';
+        widgetScript.setAttribute('data-auto-embed', 'true');
+        widgetScript.setAttribute('data-firm-name', 'Smith & Associates Attorneys');
+        widgetScript.setAttribute('data-firm-phone', '+27 11 123 4567');
+        widgetScript.setAttribute('data-firm-email', 'info@smithlaw.co.za');
+        widgetScript.setAttribute('data-emergency-phone', '+27 82 911 5555');
+        widgetScript.setAttribute('data-office-hours', 'Monday - Friday: 8:00 AM - 5:00 PM, Saturday: 9:00 AM - 1:00 PM');
+        widgetScript.setAttribute('data-color', '#1a365d');
+        widgetScript.setAttribute('data-position', 'bottom-right');
+        widgetScript.setAttribute('data-theme', 'light');
+        widgetScript.setAttribute('data-voice-call', 'true');
+        widgetScript.setAttribute('data-consultation', 'true');
+        document.head.appendChild(widgetScript);
+        
+        // Test functions
+        function testNormalError() {
+            // Open widget and send normal message
+            setTimeout(() => {
+                if (window.Verdict360Widget) {
+                    window.Verdict360Widget.open();
+                    setTimeout(() => {
+                        window.Verdict360Widget.sendMessage("I need legal help with my case");
+                    }, 500);
+                }
+            }, 1000);
+        }
+        
+        function testUrgentError() {
+            // Open widget and send urgent message
+            setTimeout(() => {
+                if (window.Verdict360Widget) {
+                    window.Verdict360Widget.open();
+                    setTimeout(() => {
+                        window.Verdict360Widget.sendMessage("This is an emergency! I need urgent legal assistance");
+                    }, 500);
+                }
+            }, 1000);
+        }
+        
+        function testConnectionError() {
+            // Open widget and send message (will trigger connection error due to no backend)
+            setTimeout(() => {
+                if (window.Verdict360Widget) {
+                    window.Verdict360Widget.open();
+                    setTimeout(() => {
+                        window.Verdict360Widget.sendMessage("Can you help with legal questions?");
+                    }, 500);
+                }
+            }, 1000);
+        }
+        
+        function openWidget() {
+            // Just open the widget without sending a message
+            setTimeout(() => {
+                if (window.Verdict360Widget) {
+                    window.Verdict360Widget.open();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

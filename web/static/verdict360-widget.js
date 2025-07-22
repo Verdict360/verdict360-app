@@ -24,6 +24,10 @@
         primaryColor: '#1E40AF', // Legal blue
         firmName: '', // Will be customized per firm
         firmLogo: '', // Optional firm logo URL
+        firmPhone: '', // Law firm's phone number
+        firmEmail: '', // Law firm's email address
+        emergencyPhone: '', // Emergency contact number
+        officeHours: 'Monday - Friday: 8:00 AM - 5:00 PM', // Business hours
         enableVoiceCall: true,
         enableConsultationBooking: true
     };
@@ -37,6 +41,10 @@
         config.primaryColor = scriptTag.getAttribute('data-color') || config.primaryColor;
         config.firmName = scriptTag.getAttribute('data-firm-name') || config.firmName;
         config.firmLogo = scriptTag.getAttribute('data-firm-logo') || config.firmLogo;
+        config.firmPhone = scriptTag.getAttribute('data-firm-phone') || config.firmPhone;
+        config.firmEmail = scriptTag.getAttribute('data-firm-email') || config.firmEmail;
+        config.emergencyPhone = scriptTag.getAttribute('data-emergency-phone') || config.emergencyPhone;
+        config.officeHours = scriptTag.getAttribute('data-office-hours') || config.officeHours;
         config.enableVoiceCall = scriptTag.getAttribute('data-voice-call') !== 'false';
         config.enableConsultationBooking = scriptTag.getAttribute('data-consultation') !== 'false';
     }
@@ -55,8 +63,8 @@
         addMessage({
             id: 'welcome_' + Date.now(),
             content: config.firmName ? 
-                `Welcome to ${config.firmName}'s legal assistant. I'm here to help with your legal questions.` :
-                'Welcome to Verdict360 Legal Assistant. I\'m here to help with your legal questions.',
+                `Welcome to ${config.firmName}'s legal assistant. I'm here to help with your legal questions and provide professional legal guidance.` :
+                'Welcome to Verdict360 Legal Assistant. I\'m here to help with your legal questions and provide professional legal guidance.',
             type: 'assistant',
             timestamp: new Date()
         });
@@ -69,8 +77,11 @@
             <!-- Widget Button (when closed) -->
             <div id="verdict360-widget-button" class="verdict360-widget-button">
                 <div class="verdict360-button-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="none">
+                        <path d="M20 2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4l4 4 4-4h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+                        <circle cx="8" cy="12" r="1" fill="${config.primaryColor}"/>
+                        <circle cx="12" cy="12" r="1" fill="${config.primaryColor}"/>
+                        <circle cx="16" cy="12" r="1" fill="${config.primaryColor}"/>
                     </svg>
                 </div>
                 <div class="verdict360-button-pulse"></div>
@@ -92,9 +103,14 @@
                     </div>
                     <div class="verdict360-header-actions">
                         ${config.enableVoiceCall ? 
-                            '<button id="verdict360-voice-call" class="verdict360-action-btn" title="Voice Call">📞</button>' : ''
+                            '<button id="verdict360-voice-call" class="verdict360-action-btn" title="Voice Call"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>' : ''
                         }
-                        <button id="verdict360-close-btn" class="verdict360-close-btn" title="Close">×</button>
+                        <button id="verdict360-close-btn" class="verdict360-close-btn" title="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 
@@ -113,20 +129,19 @@
                     <div class="verdict360-input-container">
                         <textarea 
                             id="verdict360-message-input" 
-                            placeholder="Ask your legal question..."
+                            placeholder="Ask any legal question..."
                             rows="1"
                         ></textarea>
                         <button id="verdict360-send-btn" class="verdict360-send-btn" disabled>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 2L11 13"/>
-                                <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none">
+                                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
                             </svg>
                         </button>
                     </div>
                     <div class="verdict360-input-footer">
                         <span class="verdict360-help-text">Press Enter to send • Shift+Enter for new line</span>
                         ${config.enableConsultationBooking ? 
-                            '<button id="verdict360-book-consultation" class="verdict360-book-btn">📅 Book Consultation</button>' : ''
+                            '<button id="verdict360-book-consultation" class="verdict360-book-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Book Consultation</button>' : ''
                         }
                     </div>
                 </div>
@@ -511,6 +526,51 @@
             .replace(/\n/g, '<br>');
     }
     
+    // Generate enhanced error message with contact information
+    function createErrorMessage(type = 'technical') {
+        let baseMessage = '';
+        let contactInfo = '';
+        
+        // Build contact information if available
+        if (config.firmPhone || config.firmEmail) {
+            contactInfo += '\n\n**Contact us directly:**';
+            
+            if (config.firmPhone) {
+                contactInfo += `\n📞 **Phone:** [${config.firmPhone}](tel:${config.firmPhone.replace(/\s/g, '')})`;
+            }
+            
+            if (config.firmEmail) {
+                contactInfo += `\n📧 **Email:** [${config.firmEmail}](mailto:${config.firmEmail})`;
+            }
+            
+            if (config.emergencyPhone && type === 'urgent') {
+                contactInfo += `\n🚨 **Emergency:** [${config.emergencyPhone}](tel:${config.emergencyPhone.replace(/\s/g, '')})`;
+            }
+            
+            if (config.officeHours) {
+                contactInfo += `\n⏰ **Office Hours:** ${config.officeHours}`;
+            }
+        }
+        
+        // Different messages based on error type
+        switch (type) {
+            case 'urgent':
+                baseMessage = `I apologize, but I'm currently experiencing technical difficulties. For urgent legal matters, please contact us directly using the information below:${contactInfo}`;
+                break;
+            case 'connection':
+                baseMessage = `I'm having trouble connecting to our legal database. Please try again in a moment, or contact our office directly:${contactInfo}`;
+                break;
+            case 'technical':
+            default:
+                baseMessage = config.firmName ? 
+                    `I apologize, but I'm currently experiencing technical difficulties. Please try again in a moment, or contact ${config.firmName} directly:${contactInfo}` :
+                    `I apologize, but I'm currently experiencing technical difficulties. Please try again in a moment, or contact our support team directly:${contactInfo}`;
+                break;
+        }
+        
+        return baseMessage || 'I apologize, but I\'m currently experiencing technical difficulties. Please try again in a moment.';
+    }
+    
     // Scroll to bottom of messages
     function scrollToBottom() {
         const messagesContainer = document.getElementById('verdict360-messages');
@@ -571,9 +631,18 @@
         } catch (error) {
             console.error('Verdict360 Widget Error:', error);
             
+            // Determine error type for appropriate message
+            let errorType = 'technical';
+            if (error.message && error.message.includes('fetch')) {
+                errorType = 'connection';
+            }
+            if (content.toLowerCase().includes('emergency') || content.toLowerCase().includes('urgent')) {
+                errorType = 'urgent';
+            }
+            
             const errorMessage = {
                 id: 'error_' + Date.now(),
-                content: 'I apologize, but I\'m currently experiencing technical difficulties. Please try again in a moment, or contact our support team directly.',
+                content: createErrorMessage(errorType),
                 type: 'assistant',
                 timestamp: new Date()
             };
@@ -600,7 +669,7 @@
         
         const offerMessage = {
             id: 'consultation_offer_' + Date.now(),
-            content: 'Would you like to **book a consultation** with one of our qualified attorneys? I can help you find an available time slot that works for your schedule.',
+            content: 'Would you like to **schedule a consultation** with one of our qualified attorneys? I can help you find an available appointment time that works for your schedule.',
             type: 'assistant',
             timestamp: new Date()
         };
@@ -615,7 +684,7 @@
         // This would integrate with the voice calling system
         const voiceMessage = {
             id: 'voice_' + Date.now(),
-            content: '📞 **Voice consultation feature** is being set up for you. Our system supports professional voice calls with South African legal experts. This feature will be available shortly.',
+            content: '📞 **Voice consultation feature** is being set up for you. Our system supports professional voice calls with qualified legal experts. This feature will be available shortly.',
             type: 'assistant',
             timestamp: new Date()
         };
@@ -629,7 +698,7 @@
         
         const bookingMessage = {
             id: 'booking_' + Date.now(),
-            content: '📅 **Consultation booking** is being prepared for you. I can help you find available time slots with our qualified attorneys. What type of legal matter would you like to discuss?',
+            content: '📅 **Consultation scheduling** is being prepared for you. I can help you find available appointment times with our qualified attorneys. What type of legal matter would you like to discuss?',
             type: 'assistant',
             timestamp: new Date()
         };
