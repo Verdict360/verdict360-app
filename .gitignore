@@ -34,6 +34,16 @@ docker-volumes/
 web-sveltekit/.svelte-kit/
 web-sveltekit/build/
 web-sveltekit/dist/
+.svelte-kit/
+/build
+.output
+.vercel
+.netlify
+.wrangler
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
 # Node modules
 node_modules/
