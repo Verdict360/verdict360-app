@@ -1,16 +1,20 @@
 """
 API Router for Verdict360 Legal Intelligence Platform
-Combines all API endpoints for legal document processing and search
+Combines all API endpoints for legal document processing, chat, and consultation management
 """
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import search, documents
+from app.api.v1.endpoints import search, documents, chat, consultation, voice, webhooks
 
 api_router = APIRouter()
 
 # Include all endpoint routers
 api_router.include_router(search.router, prefix="/search", tags=["Legal Search & Chat"])
 api_router.include_router(documents.router, prefix="/documents", tags=["Document Management"])
+api_router.include_router(chat.router, prefix="/chat", tags=["Legal AI Chat"])
+api_router.include_router(consultation.router, prefix="/consultations", tags=["Consultation Booking"])
+api_router.include_router(voice.router, prefix="/voice", tags=["Voice Integration"])
+api_router.include_router(webhooks.router, prefix="/webhooks", tags=["N8N Workflow Webhooks"])
 
 # Health check for API v1
 @api_router.get("/health")
@@ -19,10 +23,29 @@ async def api_health():
     return {
         "status": "healthy",
         "api_version": "v1",
+        "capabilities": [
+            "Legal AI Chat",
+            "Consultation Booking",
+            "Voice Integration", 
+            "Document Processing",
+            "SA Legal Search",
+            "N8N Workflow Integration"
+        ],
         "endpoints": [
+            "/chat/",
+            "/consultations/",
+            "/voice/initiate-call",
             "/search/legal-query",
-            "/search/documents/search", 
             "/documents/upload",
-            "/documents/process"
-        ]
+            "/webhooks/*"
+        ],
+        "market": "South African Legal Professionals",
+        "features": {
+            "ai_legal_chat": True,
+            "consultation_booking": True,
+            "voice_calls": True,
+            "sa_legal_citations": True,
+            "workflow_automation": True,
+            "crm_integration": True
+        }
     }

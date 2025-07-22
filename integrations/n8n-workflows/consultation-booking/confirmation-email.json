@@ -1,0 +1,153 @@
+{
+  "name": "Verdict360 - Consultation Confirmation Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "confirmation-email",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-confirmation",
+      "name": "Confirmation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "consultations@verdict360.co.za",
+        "toEmail": "={{ $json.client_email }}",
+        "subject": "Consultation Confirmed - Verdict360 Legal Services",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; }\n        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }\n        .content { padding: 30px 20px; }\n        .consultation-details { background-color: #F8FAFC; padding: 20px; border-left: 4px solid #4F46E5; margin: 20px 0; }\n        .footer { background-color: #1E293B; color: white; padding: 20px; text-align: center; font-size: 12px; }\n        .button { display: inline-block; background-color: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }\n        .urgent { border-left-color: #EF4444 !important; }\n        .urgent-badge { background-color: #EF4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }\n    </style>\n</head>\n<body>\n    <div class=\"header\">\n        <h1>⚖️ Verdict360 Legal Services</h1>\n        <p>Professional Legal Assistance for South Africa</p>\n    </div>\n    \n    <div class=\"content\">\n        <h2>Consultation Confirmed</h2>\n        \n        <p>Dear {{ $json.client_name }},</p>\n        \n        <p>Thank you for choosing Verdict360 for your legal consultation. We have received your request and our team is preparing to assist you.</p>\n        \n        <div class=\"consultation-details {{ $json.urgency_level === 'critical' ? 'urgent' : '' }}\">\n            {{ $json.urgency_level === 'critical' ? '<span class=\"urgent-badge\">URGENT MATTER</span><br><br>' : '' }}\n            <h3>Consultation Details:</h3>\n            <p><strong>Legal Area:</strong> {{ $json.legal_area }}</p>\n            <p><strong>Matter Type:</strong> {{ $json.consultation_type }}</p>\n            <p><strong>Urgency Level:</strong> {{ $json.urgency_level }}</p>\n            <p><strong>Preferred Date:</strong> {{ $json.preferred_date || 'To be scheduled' }}</p>\n            <p><strong>Preferred Time:</strong> {{ $json.preferred_time || 'To be confirmed' }}</p>\n            <p><strong>Estimated Duration:</strong> {{ $json.estimated_duration || 60 }} minutes</p>\n            <p><strong>Estimated Cost:</strong> R{{ $json.estimated_cost || 'TBC' }}</p>\n            <p><strong>Reference ID:</strong> {{ $json.consultation_id }}</p>\n        </div>\n        \n        <h3>What Happens Next?</h3>\n        <ul>\n            <li>{{ $json.urgency_level === 'critical' ? 'Priority assignment within 2 hours' : 'Legal matter assigned to appropriate specialist' }}</li>\n            <li>You will receive a calendar invitation with meeting details</li>\n            <li>Preparation materials and document checklist will be provided</li>\n            <li>{{ $json.urgency_level === 'critical' ? 'Direct contact from senior legal professional' : 'Confirmation call within 24 hours' }}</li>\n        </ul>\n        \n        <h3>Preparation for Your Consultation:</h3>\n        <ul>\n            <li>Gather all relevant documentation</li>\n            <li>Prepare a timeline of events</li>\n            <li>List your key questions and concerns</li>\n            <li>Have contact information for other involved parties ready</li>\n        </ul>\n        \n        <div style=\"text-align: center; margin: 30px 0;\">\n            <a href=\"https://verdict360.co.za/consultation/{{ $json.consultation_id }}\" class=\"button\">View Consultation Details</a>\n        </div>\n        \n        <p><strong>Important:</strong> This consultation will provide general legal guidance. For specific legal advice tailored to your situation, follow-up appointments with our qualified attorneys may be recommended.</p>\n        \n        <p>If you have any questions or need to modify this consultation, please contact us immediately at:</p>\n        <ul>\n            <li>📧 Email: consultations@verdict360.co.za</li>\n            <li>📞 Phone: +27 11 123 4567</li>\n            <li>💬 WhatsApp: +27 82 123 4567</li>\n        </ul>\n    </div>\n    \n    <div class=\"footer\">\n        <p>© 2024 Verdict360 Legal Services | Professional Legal Assistance for South Africa</p>\n        <p>This email was sent regarding consultation reference: {{ $json.consultation_id }}</p>\n        <p>Registered with the Legal Practice Council of South Africa</p>\n    </div>\n</body>\n</html>",
+        "attachments": []
+      },
+      "id": "send-confirmation-email",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.urgency_level }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "check-urgent-sms",
+      "name": "Check if SMS Required",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "message": "🚨 URGENT: Verdict360 Legal - Your critical legal matter (Ref: {{ $json.consultation_id }}) has been received. Senior legal professional will contact you within 2 hours. Email confirmation sent. Emergency line: +27 11 123 4567",
+        "toPhoneNumber": "={{ $json.client_phone }}"
+      },
+      "id": "send-urgent-sms",
+      "name": "Send Urgent SMS",
+      "type": "n8n-nodes-base.sms",
+      "typeVersion": 1,
+      "position": [680, 150]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "status": "confirmation_sent",
+          "email_sent": true,
+          "sms_sent": "={{ $json.urgency_level === 'critical' ? 'true' : 'false' }}",
+          "consultation_id": "={{ $json.consultation_id }}",
+          "next_contact": "={{ $json.urgency_level === 'critical' ? 'Within 2 hours' : 'Within 24 hours' }}",
+          "preparation_checklist": [
+            "Gather all relevant documentation",
+            "Prepare timeline of events", 
+            "List key questions and concerns",
+            "Have contact information ready"
+          ]
+        }
+      },
+      "id": "confirmation-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Confirmation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Check if SMS Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if SMS Required": {
+      "main": [
+        [
+          {
+            "node": "Send Urgent SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Urgent SMS": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Africa/Johannesburg"
+  },
+  "versionId": "1.0",
+  "meta": {
+    "instanceId": "verdict360-legal-platform"
+  }
+}

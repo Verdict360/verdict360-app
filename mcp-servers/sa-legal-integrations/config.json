@@ -1,0 +1,128 @@
+{
+  "name": "verdict360-sa-legal-integrations",
+  "version": "1.0.0",
+  "description": "MCP Server for South African Legal Practice Management System Integrations",
+  "mcp": {
+    "server": {
+      "name": "sa-legal-integrations",
+      "version": "1.0.0"
+    },
+    "tools": [
+      {
+        "name": "connect_legal_system",
+        "description": "Connect to a South African legal practice management system"
+      },
+      {
+        "name": "sync_legal_matters", 
+        "description": "Synchronize legal matters from connected SA legal systems"
+      },
+      {
+        "name": "sync_client_data",
+        "description": "Synchronize client data from SA legal practice systems"
+      },
+      {
+        "name": "create_consultation_matter",
+        "description": "Create a new legal matter in SA legal system from Verdict360 consultation"
+      },
+      {
+        "name": "sync_billing_entries",
+        "description": "Synchronize billing and time tracking from SA legal systems"
+      },
+      {
+        "name": "check_system_status",
+        "description": "Check connection status and capabilities of SA legal systems"
+      },
+      {
+        "name": "export_matter_data",
+        "description": "Export comprehensive matter data for legal analysis"
+      },
+      {
+        "name": "compliance_check",
+        "description": "Run compliance checks against SA legal requirements"
+      }
+    ],
+    "resources": [
+      {
+        "uri": "sa-legal://systems/configurations",
+        "name": "SA Legal Systems Configurations",
+        "description": "Configuration details for supported SA legal software systems"
+      },
+      {
+        "uri": "sa-legal://compliance/frameworks",
+        "name": "SA Legal Compliance Frameworks",
+        "description": "South African legal compliance requirements and frameworks"
+      },
+      {
+        "uri": "sa-legal://matters/templates",
+        "name": "Legal Matter Templates",
+        "description": "Standard templates for SA legal matter types"
+      },
+      {
+        "uri": "sa-legal://billing/rates",
+        "name": "SA Legal Billing Rates",
+        "description": "Standard billing rates for different legal services in SA"
+      }
+    ]
+  },
+  "supported_systems": {
+    "lawpracticeza": {
+      "name": "LawPracticeZA",
+      "website": "https://lawpracticeza.co.za",
+      "market_share": "25%",
+      "primary_features": ["Matter Management", "Client Portal", "Document Management", "Billing"]
+    },
+    "legal_interact": {
+      "name": "Legal Interact", 
+      "website": "https://legalinteract.co.za",
+      "market_share": "20%",
+      "primary_features": ["Case Management", "Client Communication", "Billing", "Reporting"]
+    },
+    "ajs_legal": {
+      "name": "AJS Legal Software",
+      "website": "https://ajslegal.co.za", 
+      "market_share": "18%",
+      "primary_features": ["Practice Management", "Trust Accounting", "Compliance", "Integration"]
+    },
+    "legal_suite": {
+      "name": "Legal Suite SA",
+      "website": "https://legalsuitesa.com",
+      "market_share": "15%",
+      "primary_features": ["Document Automation", "Workflow", "Client Management", "Analytics"]
+    },
+    "attorney_online": {
+      "name": "Attorney Online",
+      "website": "https://attorneyonline.co.za",
+      "market_share": "12%", 
+      "primary_features": ["Matter Management", "Time Tracking", "Trust Fund Management", "Reporting"]
+    }
+  },
+  "compliance_frameworks": {
+    "popia": {
+      "full_name": "Protection of Personal Information Act",
+      "act_number": "Act 4 of 2013",
+      "effective_date": "2021-07-01",
+      "authority": "Information Regulator South Africa"
+    },
+    "legal_practice_act": {
+      "full_name": "Legal Practice Act",
+      "act_number": "Act 28 of 2014", 
+      "effective_date": "2018-11-01",
+      "authority": "Legal Practice Council"
+    },
+    "attorney_fidelity_fund": {
+      "full_name": "Attorney Fidelity Fund Act",
+      "act_number": "Act 53 of 1941",
+      "authority": "Attorneys Fidelity Fund",
+      "contribution_rate": "0.5% of professional fees"
+    }
+  },
+  "integration_settings": {
+    "default_timeout": 30,
+    "max_retries": 3,
+    "rate_limit_per_minute": 100,
+    "data_retention_days": 90,
+    "encryption_required": true,
+    "audit_logging": true,
+    "compliance_monitoring": true
+  }
+}

@@ -16,6 +16,7 @@ from app.api.v1.api import api_router
 from app.core.config import settings
 from app.services.vector_store import VectorStoreService
 from app.api.v1.endpoints.search import set_vector_store
+from app.api.v1.endpoints.chat import set_vector_store as set_chat_vector_store
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -44,8 +45,9 @@ async def lifespan(app: FastAPI):
         # Store in app state for access in endpoints
         app.state.vector_store = vector_store
         
-        # Set global vector store for search endpoints
+        # Set global vector store for search and chat endpoints
         set_vector_store(vector_store)
+        set_chat_vector_store(vector_store)
         
         logger.info("✅ Vector database initialized successfully")
         logger.info(f"📊 Collection: {settings.CHROMA_COLLECTION_NAME}")
@@ -78,6 +80,9 @@ app.add_middleware(
         "http://localhost:3000",  # Next.js frontend
         "http://127.0.0.1:3000",
         "http://localhost:3001",  # Alternative ports
+        "http://localhost:5173",  # SvelteKit dev server
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",  # SvelteKit preview
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],

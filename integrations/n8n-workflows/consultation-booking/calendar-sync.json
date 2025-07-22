@@ -1,0 +1,165 @@
+{
+  "name": "Verdict360 - Calendar Sync for Legal Consultations",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar-sync",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-consultation-calendar",
+      "name": "Consultation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.urgency_level }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "urgency-check",
+      "name": "Check Urgency",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{ $json.preferred_date }}T{{ $json.preferred_time || '09:00' }}:00",
+        "end": "={{ DateTime.fromISO($json.preferred_date + 'T' + ($json.preferred_time || '09:00')).plus({hours: 1}).toISO() }}",
+        "summary": "Legal Consultation - {{ $json.client_name }}",
+        "description": "Legal Area: {{ $json.legal_area }}\\nMatter: {{ $json.matter_description.substring(0, 200) }}...\\n\\nClient: {{ $json.client_name }}\\nEmail: {{ $json.client_email }}\\nPhone: {{ $json.client_phone || 'Not provided' }}",
+        "attendees": [
+          {
+            "email": "{{ $json.client_email }}"
+          }
+        ]
+      },
+      "id": "google-calendar",
+      "name": "Schedule in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{ DateTime.fromISO($json.preferred_date + 'T' + ($json.preferred_time || '09:00')).minus({hours: 24}).toISO() }}",
+        "end": "={{ DateTime.fromISO($json.preferred_date + 'T' + ($json.preferred_time || '09:00')).minus({hours: 23}).toISO() }}",
+        "summary": "URGENT: Legal Consultation - {{ $json.client_name }}",
+        "description": "🚨 URGENT LEGAL MATTER\\n\\nLegal Area: {{ $json.legal_area }}\\nUrgency: {{ $json.urgency_level }}\\nMatter: {{ $json.matter_description.substring(0, 200) }}...\\n\\nClient: {{ $json.client_name }}\\nEmail: {{ $json.client_email }}\\nPhone: {{ $json.client_phone || 'Not provided' }}\\n\\nRequires immediate attention within 24 hours.",
+        "attendees": [
+          {
+            "email": "{{ $json.client_email }}"
+          }
+        ]
+      },
+      "id": "urgent-calendar",
+      "name": "Schedule Urgent Consultation",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": {
+          "status": "scheduled",
+          "calendar_event_created": true,
+          "consultation_id": "={{ $json.consultation_id }}",
+          "scheduled_time": "={{ $json.preferred_date }}T{{ $json.preferred_time || '09:00' }}:00",
+          "urgency_handling": "={{ $json.urgency_level === 'critical' ? 'expedited_scheduling' : 'standard_scheduling' }}",
+          "next_steps": [
+            "Calendar invitation sent to client",
+            "Lawyer notified of appointment",
+            "Preparation materials will be provided"
+          ]
+        }
+      },
+      "id": "response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Consultation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Urgency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Urgency": {
+      "main": [
+        [
+          {
+            "node": "Schedule Urgent Consultation",
+            "type": "main", 
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule in Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule in Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Urgent Consultation": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Africa/Johannesburg"
+  },
+  "versionId": "1.0",
+  "meta": {
+    "instanceId": "verdict360-legal-platform"
+  }
+}
