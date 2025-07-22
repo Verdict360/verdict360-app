@@ -115,8 +115,104 @@ Priority Tasks:
 
 ### Voice Integration Priority
 ```bash
-Claude Code Prompt for Voice Implementation:
-"Complete the voice integration for our legal chatbot platform. Implement Retell AI integration using the existing database schema and API endpoints. Set up South African virtual phone numbers and connect voice calls to our consultation booking system. Include proper error handling and POPIA compliance for voice data."
+# Claude Code Prompt: Complete Voice Integration for Legal Chatbot
+
+## PROJECT CONTEXT
+I have a legal chatbot platform for South African law firms with existing database schema and API structure for voice calls. I need to implement the actual voice integration using Retell AI for conversation handling and ElevenLabs for text-to-speech, with South African virtual phone numbers.
+
+## CURRENT STATUS
+✅ Database schema ready (voice_calls, voice_transcripts tables)
+✅ API endpoint structure prepared (/api/v1/voice/)
+✅ PostgreSQL with conversation and consultation booking systems
+✅ N8N workflow foundation for automation
+❌ Actual voice service implementation missing
+
+## IMPLEMENTATION REQUIREMENTS
+
+### 1. RETELL AI INTEGRATION
+# Implement in api-python/app/services/voice_service.py:
+- Set up Retell AI client with API authentication
+- Create phone call initiation with SA phone numbers
+- Handle real-time conversation with legal context
+- Connect to existing consultation booking system
+- Implement call recording and transcription storage
+
+### 2. ELEVENLABS TEXT-TO-SPEECH
+# Add to voice_service.py:
+- Professional legal voice synthesis
+- South African English accent optimization
+- Legal terminology pronunciation
+- Dynamic voice responses based on legal context
+- Voice settings for different law firm branding
+
+### 3. SA VIRTUAL PHONE NUMBERS
+# Phone number management:
+- Integration with SA telecoms (Telkom, Vodacom Business)
+- Virtual number provisioning via Retell AI
+- Call routing to legal chatbot system
+- Business hours handling (SA timezone)
+- Emergency legal matter escalation
+
+### 4. VOICE CONVERSATION FLOW
+# Legal conversation logic:
+- Welcome message with law firm branding
+- Legal matter intake via voice
+- Urgency assessment for legal issues
+- Automatic consultation booking
+- Escalation to human lawyers when needed
+- POPIA compliance for voice data
+
+### 5. DATABASE INTEGRATION
+# Connect to existing schema:
+- Store voice calls in voice_calls table
+- Save transcriptions in voice_transcripts table
+- Link to consultations table for booking
+- Trigger N8N workflows for follow-up
+- Legal analytics for conversation insights
+
+### 6. API ENDPOINTS IMPLEMENTATION
+# Complete these endpoints in api-python/app/api/v1/endpoints/voice.py:
+POST /voice/initiate-call - Start voice consultation
+POST /voice/webhook - Handle Retell AI webhooks
+GET /voice/calls/{call_id} - Get call details
+POST /voice/end-call - End call session
+GET /voice/transcripts/{call_id} - Get call transcription
+
+### 7. LEGAL CONTEXT INTEGRATION
+# Connect to existing legal systems:
+- Use vector_store.py for legal knowledge
+- Apply legal_quality_assurance.py for response validation
+- Integrate SA legal citations in voice responses
+- Connect to consultation booking workflows
+- Apply POPIA compliance for voice data handling
+
+### 8. ERROR HANDLING & MONITORING
+# Production-ready voice handling:
+- Call failure recovery and retry logic
+- Network interruption handling
+- Voice quality monitoring
+- Legal compliance logging
+- Emergency escalation procedures
+
+## CONFIGURATION REQUIREMENTS
+# Environment Variables:
+RETELL_AI_API_KEY=your_retell_ai_key
+ELEVENLABS_API_KEY=your_elevenlabs_key
+SA_PHONE_NUMBER_PROVIDER=retell_ai
+VOICE_CALL_TIMEOUT_MINUTES=30
+LEGAL_ESCALATION_PHONE=+27_lawyer_number
+
+## SUCCESS CRITERIA
+- Voice calls work with SA phone numbers
+- Legal conversations recorded and transcribed
+- Automatic consultation booking via voice
+- Professional legal voice synthesis
+- POPIA-compliant voice data handling
+- Integration with existing legal processing
+- N8N workflow automation triggered
+- Emergency escalation to human lawyers
+
+Build a production-ready voice integration that connects seamlessly with our existing legal chatbot infrastructure while maintaining POPIA compliance and professional legal standards for South African law firms.
 ```
 
 ### Dashboard Analytics Priority  

@@ -63,26 +63,101 @@ Last Updated: 2025-07-22
 ## 🎯 CURRENT PRIORITIES (Next Tasks)
 
 ### High Priority - Voice Integration (Week 1-2)
-- [ ] **Implement Retell AI Integration**
-  - Research Retell AI API documentation
-  - Set up authentication and API keys
-  - Create voice call initiation endpoints
-  - Test basic voice call functionality
+
+#### Technical Implementation Tasks
+- [ ] **Implement Retell AI Integration** (`api-python/app/services/voice_service.py`)
+  - Set up Retell AI client with API authentication
+  - Create phone call initiation with SA phone numbers
+  - Handle real-time conversation with legal context
+  - Connect to existing consultation booking system
+  - Implement call recording and transcription storage
   - **Expected Impact**: Core voice functionality operational
 
+- [ ] **Implement ElevenLabs Text-to-Speech**
+  - Professional legal voice synthesis integration
+  - South African English accent optimization
+  - Legal terminology pronunciation enhancement
+  - Dynamic voice responses based on legal context
+  - Voice settings for different law firm branding
+  - **Expected Impact**: High-quality professional voice responses
+
 - [ ] **Set up South African Virtual Phone Numbers**
-  - Research SA telecom providers supporting Retell AI
-  - Configure phone number routing
-  - Set up call forwarding to Retell AI
-  - Test inbound call handling
+  - Integration with SA telecoms (Telkom, Vodacom Business)
+  - Virtual number provisioning via Retell AI
+  - Call routing to legal chatbot system
+  - Business hours handling (SA timezone)
+  - Emergency legal matter escalation
   - **Expected Impact**: SA clients can make voice calls
 
-- [ ] **Connect Voice to Consultation Booking**
-  - Integrate voice transcription with existing booking system
-  - Add voice call data to PostgreSQL schema
-  - Create consultation request from voice calls
-  - Test end-to-end voice-to-booking flow
-  - **Expected Impact**: Voice calls convert to consultations
+- [ ] **Complete Voice API Endpoints** (`api-python/app/api/v1/endpoints/voice.py`)
+  - POST /voice/initiate-call - Start voice consultation
+  - POST /voice/webhook - Handle Retell AI webhooks
+  - GET /voice/calls/{call_id} - Get call details
+  - POST /voice/end-call - End call session
+  - GET /voice/transcripts/{call_id} - Get call transcription
+  - **Expected Impact**: Complete voice API functionality
+
+#### Legal Conversation Logic
+- [ ] **Voice Conversation Flow Implementation**
+  - Welcome message with law firm branding
+  - Legal matter intake via voice
+  - Urgency assessment for legal issues
+  - Automatic consultation booking
+  - Escalation to human lawyers when needed
+  - POPIA compliance for voice data
+  - **Expected Impact**: Professional legal voice consultations
+
+- [ ] **Legal Context Integration**
+  - Use vector_store.py for legal knowledge
+  - Apply legal_quality_assurance.py for response validation
+  - Integrate SA legal citations in voice responses
+  - Connect to consultation booking workflows
+  - Apply POPIA compliance for voice data handling
+  - **Expected Impact**: Accurate legal information in voice calls
+
+#### Database & Workflow Integration
+- [ ] **Database Integration Enhancement**
+  - Store voice calls in voice_calls table
+  - Save transcriptions in voice_transcripts table
+  - Link to consultations table for booking
+  - Trigger N8N workflows for follow-up
+  - Legal analytics for conversation insights
+  - **Expected Impact**: Complete voice data management
+
+- [ ] **N8N Workflow Automation**
+  - voice-call-started webhook
+  - voice-call-ended webhook
+  - consultation-booked-via-voice webhook
+  - voice-escalation-required webhook
+  - voice-call-analytics webhook
+  - **Expected Impact**: Automated voice call workflows
+
+#### Production Readiness
+- [ ] **Error Handling & Monitoring**
+  - Call failure recovery and retry logic
+  - Network interruption handling
+  - Voice quality monitoring
+  - Legal compliance logging
+  - Emergency escalation procedures
+  - **Expected Impact**: Production-ready voice system
+
+- [ ] **Environment Configuration**
+  - RETELL_AI_API_KEY configuration
+  - ELEVENLABS_API_KEY setup
+  - SA_PHONE_NUMBER_PROVIDER integration
+  - VOICE_CALL_TIMEOUT_MINUTES setting
+  - LEGAL_ESCALATION_PHONE configuration
+  - **Expected Impact**: Proper voice service configuration
+
+#### Testing & Validation
+- [ ] **Voice Integration Testing**
+  - Test incoming calls to SA virtual number
+  - Verify legal conversation quality
+  - Test consultation booking via voice
+  - Validate transcription accuracy
+  - Check N8N workflow triggers
+  - Test emergency escalation procedures
+  - **Expected Impact**: Validated voice system functionality
 
 ### Medium Priority - Dashboard Analytics (Week 2-3)
 - [ ] **Build Conversation Analytics Pipeline**
