@@ -6,6 +6,45 @@ import re
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 
+def classify_legal_matter_urgency(description: str) -> Dict[str, str]:
+    """
+    Classify the urgency level of a legal matter based on description
+    """
+    description_lower = description.lower()
+    
+    # Critical urgency indicators
+    critical_keywords = [
+        'emergency', 'arrest', 'police', 'court tomorrow', 'today', 
+        'deadline today', 'immediate', 'urgent arrest', 'bail application'
+    ]
+    
+    # High urgency indicators  
+    high_keywords = [
+        'urgent', 'deadline', 'court date', 'soon', 'time sensitive',
+        'this week', 'asap', 'quickly'
+    ]
+    
+    # Check for critical urgency
+    if any(keyword in description_lower for keyword in critical_keywords):
+        return {
+            'urgency_level': 'critical',
+            'reason': 'Contains emergency or time-critical legal indicators'
+        }
+    
+    # Check for high urgency
+    elif any(keyword in description_lower for keyword in high_keywords):
+        return {
+            'urgency_level': 'high', 
+            'reason': 'Contains urgent legal matter indicators'
+        }
+    
+    # Default to normal urgency
+    else:
+        return {
+            'urgency_level': 'normal',
+            'reason': 'No specific urgency indicators detected'
+        }
+
 @dataclass
 class SALegalCitation:
     """South African legal citation with metadata"""

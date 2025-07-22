@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Law Firm Website - Widget Integration Test</title>
+    <style>
+        /* Sample law firm website styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Georgia, serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        .header {
+            background: #1a365d;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #4a90e2;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #4a90e2;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #357abd;
+        }
+        
+        .services {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .services h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: #1a365d;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #1a365d;
+        }
+        
+        .about {
+            padding: 80px 0;
+        }
+        
+        .about h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #1a365d;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .about-image {
+            background: #ddd;
+            height: 400px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .footer {
+            background: #1a365d;
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .contact-item h4 {
+            margin-bottom: 10px;
+            color: #4a90e2;
+        }
+        
+        /* Widget integration demo styles */
+        .widget-demo {
+            background: #e8f4f8;
+            padding: 40px 0;
+            border-top: 3px solid #4a90e2;
+        }
+        
+        .widget-demo h3 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 20px;
+        }
+        
+        .widget-demo p {
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .integration-code {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        .integration-code .comment {
+            color: #68d391;
+        }
+        
+        .integration-code .string {
+            color: #fbb6ce;
+        }
+        
+        .integration-code .attribute {
+            color: #90cdf4;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">Smith & Associates Attorneys</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Expert Legal Counsel in South Africa</h1>
+            <p>Professional legal services with over 25 years of experience serving clients across Johannesburg and Cape Town</p>
+            <a href="#contact" class="btn">Get Legal Consultation</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <h2>Our Legal Services</h2>
+            <div class="service-grid">
+                <div class="service-card">
+                    <span class="service-icon">⚖️</span>
+                    <h3>Criminal Law</h3>
+                    <p>Expert defense representation for all criminal matters including bail applications, plea negotiations, and trial advocacy.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🏠</span>
+                    <h3>Family Law</h3>
+                    <p>Comprehensive family law services including divorce proceedings, child custody arrangements, and maintenance disputes.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🏢</span>
+                    <h3>Commercial Law</h3>
+                    <p>Business legal services including contract drafting, corporate governance, and commercial dispute resolution.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">🏘️</span>
+                    <h3>Property Law</h3>
+                    <p>Property transactions, transfer registrations, bond applications, and property dispute resolution services.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">👥</span>
+                    <h3>Employment Law</h3>
+                    <p>Employment disputes, unfair dismissal cases, labour relations, and workplace legal compliance.</p>
+                </div>
+                <div class="service-card">
+                    <span class="service-icon">📄</span>
+                    <h3>Civil Litigation</h3>
+                    <p>Civil dispute resolution, debt collection, personal injury claims, and general litigation services.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2>About Our Law Firm</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Smith & Associates Attorneys has been serving the South African legal community for over 25 years. Our team of experienced attorneys specializes in providing comprehensive legal services to individuals, families, and businesses throughout South Africa.</p>
+                    
+                    <p>We pride ourselves on delivering personalized attention to each client while maintaining the highest standards of professional excellence. Our commitment to justice and client satisfaction has earned us recognition as one of the leading law firms in the region.</p>
+                    
+                    <p><strong>Try our new AI Legal Assistant</strong> - Ask any South African legal question and get immediate guidance. The chat widget in the bottom-right corner is powered by advanced legal AI trained specifically on South African law.</p>
+                </div>
+                <div class="about-image">
+                    [Law Firm Office Image]<br>
+                    Professional Environment
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Widget Integration Demo -->
+    <section class="widget-demo">
+        <div class="container">
+            <h3>🤖 AI Legal Assistant Integration Demo</h3>
+            <p>This page demonstrates how the Verdict360 chatbot widget integrates seamlessly with any law firm website.</p>
+            
+            <h4>Integration Code:</h4>
+            <div class="integration-code">
+<span class="comment">&lt;!-- Simple Integration --&gt;</span>
+<span class="string">&lt;script</span> <span class="attribute">src</span>=<span class="string">"https://verdict360.com/verdict360-widget.js"</span> 
+        <span class="attribute">data-auto-embed</span>=<span class="string">"true"</span>
+        <span class="attribute">data-firm-name</span>=<span class="string">"Smith &amp; Associates Attorneys"</span>
+        <span class="attribute">data-color</span>=<span class="string">"#1a365d"</span>&gt;<span class="string">&lt;/script&gt;</span>
+
+<span class="comment">&lt;!-- Or Custom Container --&gt;</span>
+<span class="string">&lt;div</span> <span class="attribute">id</span>=<span class="string">"legal-chatbot"</span><span class="string">&gt;&lt;/div&gt;</span>
+<span class="string">&lt;script</span> <span class="attribute">src</span>=<span class="string">"https://verdict360.com/verdict360-widget.js"</span><span class="string">&gt;&lt;/script&gt;</span>
+<span class="string">&lt;script&gt;</span>
+    Verdict360Widget.init('legal-chatbot');
+<span class="string">&lt;/script&gt;</span>
+            </div>
+            
+            <p><strong>Look for the blue chat icon in the bottom-right corner!</strong> Click it to test our legal AI assistant.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="footer" id="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h4>Johannesburg Office</h4>
+                    <p>123 Commissioner Street<br>
+                    Johannesburg, 2001<br>
+                    Phone: +27 11 123 4567<br>
+                    Email: jhb@smithlaw.co.za</p>
+                </div>
+                <div class="contact-item">
+                    <h4>Cape Town Office</h4>
+                    <p>456 Long Street<br>
+                    Cape Town, 8001<br>
+                    Phone: +27 21 987 6543<br>
+                    Email: cpt@smithlaw.co.za</p>
+                </div>
+                <div class="contact-item">
+                    <h4>Business Hours</h4>
+                    <p>Monday - Friday: 8:00 AM - 5:00 PM<br>
+                    Saturday: 9:00 AM - 1:00 PM<br>
+                    Sunday: Closed<br>
+                    Emergency consultations available 24/7</p>
+                </div>
+            </div>
+            
+            <p>&copy; 2024 Smith & Associates Attorneys. All rights reserved. | Powered by Verdict360 AI</p>
+        </div>
+    </section>
+
+    <!-- Verdict360 Legal Chatbot Widget -->
+    <!-- This demonstrates the actual integration -->
+    <script>
+        // Load the widget script dynamically for demo purposes
+        // In production, this would be a direct script tag
+        const widgetScript = document.createElement('script');
+        widgetScript.src = './web/static/verdict360-widget.js';
+        widgetScript.setAttribute('data-auto-embed', 'true');
+        widgetScript.setAttribute('data-firm-name', 'Smith & Associates Attorneys');
+        widgetScript.setAttribute('data-color', '#1a365d');
+        widgetScript.setAttribute('data-position', 'bottom-right');
+        widgetScript.setAttribute('data-theme', 'light');
+        widgetScript.setAttribute('data-voice-call', 'true');
+        widgetScript.setAttribute('data-consultation', 'true');
+        document.head.appendChild(widgetScript);
+    </script>
+</body>
+</html>
