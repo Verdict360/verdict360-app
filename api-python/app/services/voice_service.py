@@ -5,10 +5,13 @@ Handles voice consultations, call management, and speech synthesis
 
 import asyncio
 import logging
+import os
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import uuid
 import httpx
+import json
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +50,30 @@ class TranscriptSegment:
 class VoiceService:
     """Service for managing voice consultations and speech synthesis"""
     
-    def __init__(self):
-        # In-memory storage (replace with database in production)
+    def __init__(self, db_service=None):
+        # Database service for persistent storage
+        self.db_service = db_service
+        
+        # Fallback in-memory storage for development/testing
         self._call_sessions = {}  # call_session_id -> VoiceCallSession
         self._transcripts = {}    # call_session_id -> List[TranscriptSegment]
         
-        # API configurations (these would come from environment variables)
-        self.retell_api_key = "your_retell_api_key"
-        self.retell_api_url = "https://api.retellai.com/v1"
-        self.elevenlabs_api_key = "your_elevenlabs_api_key"
+        # API configurations from environment variables
+        self.retell_api_key = os.getenv("RETELL_AI_API_KEY")
+        self.retell_api_url = "https://api.retell.ai/v2"
+        self.retell_webhook_secret = os.getenv("RETELL_AI_WEBHOOK_SECRET")
+        
+        self.elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY") 
         self.elevenlabs_api_url = "https://api.elevenlabs.io/v1"
+        self.elevenlabs_voice_id = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+        
+        # South African phone number configuration
+        self.sa_phone_number_provider = os.getenv("SA_PHONE_NUMBER_PROVIDER", "retell_ai")
+        self.voice_call_timeout_minutes = int(os.getenv("VOICE_CALL_TIMEOUT_MINUTES", "30"))
+        self.legal_escalation_phone = os.getenv("LEGAL_ESCALATION_PHONE")
+        
+        # HTTP client for API calls
+        self.http_client = httpx.AsyncClient(timeout=30.0)
 
     async def create_call_session(
         self,
@@ -135,29 +152,59 @@ class VoiceService:
     ) -> Dict[str, Any]:
         """Initiate call with Retell AI"""
         try:
-            # Prepare call configuration
+            if not self.retell_api_key:
+                raise ValueError("Retell AI API key not configured")
+            
+            # Format phone number for SA (+27 prefix)
+            formatted_phone = self._format_sa_phone_number(phone_number)
+            
+            # Prepare call configuration for Retell AI
             call_config = {
-                "phone_number": phone_number,
-                "persona": persona_config,
+                "from_number": "+27871234567",  # Your SA virtual number
+                "to_number": formatted_phone,
+                "override_agent_id": None,  # Use default agent
                 "webhook_url": webhook_url,
-                "metadata": {
+                "retell_llm_dynamic_variables": {
                     "call_session_id": call_session_id,
+                    "legal_area": persona_config.get("legal_area", "general"),
+                    "jurisdiction": "South Africa",
+                    "consultation_type": persona_config.get("consultation_type", "consultation")
+                },
+                "metadata": {
                     "service": "verdict360_legal",
+                    "session_id": call_session_id,
                     "jurisdiction": "south_africa"
                 }
             }
             
-            # In a real implementation, this would make an HTTP request to Retell AI
-            # For now, simulate the response
-            mock_response = {
-                "call_id": f"retell_{uuid.uuid4().hex[:8]}",
-                "status": "initiated",
-                "estimated_cost": 2.50,  # ZAR per minute
-                "webhook_registered": True
+            # Make API request to Retell AI
+            headers = {
+                "Authorization": f"Bearer {self.retell_api_key}",
+                "Content-Type": "application/json"
             }
             
-            logger.info(f"Initiated Retell AI call for session {call_session_id}")
-            return mock_response
+            response = await self.http_client.post(
+                f"{self.retell_api_url}/call",
+                json=call_config,
+                headers=headers
+            )
+            
+            if response.status_code != 201:
+                error_detail = response.text
+                logger.error(f"Retell AI call failed: {response.status_code} - {error_detail}")
+                raise Exception(f"Retell AI API error: {response.status_code}")
+            
+            retell_response = response.json()
+            
+            logger.info(f"Successfully initiated Retell AI call {retell_response.get('call_id')} for session {call_session_id}")
+            return {
+                "call_id": retell_response.get("call_id"),
+                "status": "initiated", 
+                "estimated_cost": 15.0,  # R15 per minute for SA calls
+                "webhook_registered": True,
+                "from_number": call_config["from_number"],
+                "to_number": formatted_phone
+            }
             
         except Exception as e:
             logger.error(f"Failed to initiate Retell call: {str(e)}")
@@ -251,29 +298,71 @@ class VoiceService:
     async def generate_speech(
         self,
         text: str,
-        voice_id: str = "professional_sa_legal",
-        output_format: str = "mp3",
+        voice_id: Optional[str] = None,
+        output_format: str = "mp3_44100_128",
         legal_context: bool = True
     ) -> Dict[str, Any]:
         """Generate speech using ElevenLabs"""
         try:
-            # In a real implementation, this would call ElevenLabs API
-            # For now, simulate the response
+            if not self.elevenlabs_api_key:
+                raise ValueError("ElevenLabs API key not configured")
             
-            # Prepare text for legal context
+            # Use configured voice ID or default
+            actual_voice_id = voice_id or self.elevenlabs_voice_id
+            
+            # Prepare text for legal context (add appropriate pauses)
             if legal_context:
                 text = self._prepare_legal_text_for_speech(text)
             
-            mock_response = {
-                "audio_url": f"https://api.elevenlabs.io/v1/audio/generated_{uuid.uuid4().hex[:8]}.{output_format}",
-                "duration": len(text) * 0.1,  # Rough duration estimate
-                "voice_id": voice_id,
-                "format": output_format,
-                "legal_optimized": legal_context
+            # ElevenLabs API request
+            tts_config = {
+                "text": text,
+                "model_id": "eleven_multilingual_v2",  # Supports South African English
+                "voice_settings": {
+                    "stability": 0.5,
+                    "similarity_boost": 0.8,
+                    "style": 0.2,  # Professional, less expressive
+                    "use_speaker_boost": True
+                }
             }
             
-            logger.info(f"Generated speech for {len(text)} characters")
-            return mock_response
+            headers = {
+                "Accept": f"audio/{output_format.split('_')[0]}",
+                "Content-Type": "application/json",
+                "xi-api-key": self.elevenlabs_api_key
+            }
+            
+            response = await self.http_client.post(
+                f"{self.elevenlabs_api_url}/text-to-speech/{actual_voice_id}",
+                json=tts_config,
+                headers=headers
+            )
+            
+            if response.status_code != 200:
+                error_detail = response.text
+                logger.error(f"ElevenLabs TTS failed: {response.status_code} - {error_detail}")
+                raise Exception(f"ElevenLabs API error: {response.status_code}")
+            
+            # The response contains the audio data
+            audio_data = response.content
+            
+            # In production, you'd save this to storage and return URL
+            # For now, return a base64 encoded version
+            audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+            
+            # Calculate approximate duration (chars per second varies by language)
+            estimated_duration = len(text) / 14  # ~14 characters per second for professional speech
+            
+            logger.info(f"Generated speech for {len(text)} characters using ElevenLabs")
+            return {
+                "audio_data": audio_base64,
+                "audio_format": output_format,
+                "duration_seconds": round(estimated_duration, 2),
+                "voice_id": actual_voice_id,
+                "character_count": len(text),
+                "legal_optimized": legal_context,
+                "model": "eleven_multilingual_v2"
+            }
             
         except Exception as e:
             logger.error(f"Failed to generate speech: {str(e)}")
@@ -531,6 +620,71 @@ class VoiceService:
             ])
         
         return actions[:5]  # Limit to top 5 actions
+
+    def _format_sa_phone_number(self, phone_number: str) -> str:
+        """Format phone number for South African standards"""
+        # Remove spaces and special characters
+        cleaned = ''.join(filter(str.isdigit, phone_number))
+        
+        # Handle different formats
+        if cleaned.startswith('27'):
+            # Already has country code
+            return f"+{cleaned}"
+        elif cleaned.startswith('0'):
+            # Local format, convert to international
+            return f"+27{cleaned[1:]}"
+        elif len(cleaned) == 9:
+            # Missing leading 0, assume local
+            return f"+27{cleaned}"
+        else:
+            # Return as-is if we can't parse
+            return phone_number
+
+    async def verify_retell_webhook(self, signature: str, payload: str) -> bool:
+        """Verify webhook signature from Retell AI"""
+        try:
+            if not self.retell_webhook_secret:
+                logger.warning("Retell webhook secret not configured, skipping verification")
+                return True
+                
+            import hmac
+            import hashlib
+            
+            expected = hmac.new(
+                self.retell_webhook_secret.encode(),
+                payload.encode(),
+                hashlib.sha256
+            ).hexdigest()
+            
+            return hmac.compare_digest(f"sha256={expected}", signature)
+            
+        except Exception as e:
+            logger.error(f"Webhook verification failed: {str(e)}")
+            return False
+
+    async def cleanup_session(self, call_session_id: str) -> bool:
+        """Clean up call session resources"""
+        try:
+            if call_session_id in self._call_sessions:
+                del self._call_sessions[call_session_id]
+            if call_session_id in self._transcripts:
+                del self._transcripts[call_session_id]
+            
+            logger.info(f"Cleaned up resources for call session {call_session_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to cleanup session {call_session_id}: {str(e)}")
+            return False
+
+    async def __aenter__(self):
+        """Async context manager entry"""
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit - cleanup HTTP client"""
+        if hasattr(self, 'http_client'):
+            await self.http_client.aclose()
 
 # Global service instance
 voice_service = VoiceService()

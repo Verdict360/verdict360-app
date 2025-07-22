@@ -89,8 +89,18 @@ async def handle_voice_callback(
     Handle callbacks from Retell AI voice system.
     """
     try:
-        payload = await request.json()
-        event_type = payload.get("event_type")
+        # Get raw payload for signature verification
+        raw_payload = await request.body()
+        payload_text = raw_payload.decode('utf-8')
+        
+        # Verify webhook signature
+        signature = request.headers.get("X-Retell-Signature", "")
+        if not await voice_service.verify_retell_webhook(signature, payload_text):
+            logger.warning(f"Invalid webhook signature: {signature}")
+            raise HTTPException(status_code=401, detail="Invalid signature")
+        
+        payload = json.loads(payload_text)
+        event_type = payload.get("event")
         call_id = payload.get("call_id")
         
         logger.info(f"Voice callback received: {event_type} for call {call_id}")
@@ -101,7 +111,7 @@ async def handle_voice_callback(
             logger.warning(f"Call session not found for Retell call {call_id}")
             return {"status": "session_not_found"}
         
-        # Handle different event types
+        # Handle different event types from Retell AI
         if event_type == "call_started":
             await voice_service.update_call_session(
                 session_id=call_session.id,
