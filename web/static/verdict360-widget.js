@@ -590,7 +590,7 @@
         showTyping();
         
         try {
-            const response = await fetch(`${config.apiUrl}/chat/`, {
+            const response = await fetch(`${config.apiUrl}/simple-chat/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -614,7 +614,7 @@
             
             const assistantMessage = {
                 id: 'assistant_' + Date.now(),
-                content: data.response || data.message || 'I apologize, but I\'m having trouble processing your request. Please try again.',
+                content: data.response || 'I apologize, but I\'m having trouble processing your request. Please try again.',
                 type: 'assistant',
                 timestamp: new Date()
             };
