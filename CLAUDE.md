@@ -183,6 +183,87 @@ cd web && npm run build
 docker-compose -f docker-compose.yml up -d
 ```
 
+## 📚 DOCUMENTATION MAINTENANCE
+
+### 📖 Documentation Standards
+
+**ALWAYS maintain documentation consistency and accuracy:**
+
+1. **📝 Update Documentation After Changes**
+   ```bash
+   # Always update relevant docs after code changes
+   - API changes → Update README.md API examples
+   - Widget changes → Update WIDGET_INTEGRATION.md
+   - Architecture changes → Update CLAUDE.md technical section
+   - New features → Update PROJECT_SUMMARY.md completion %
+   ```
+
+2. **🔄 Keep Documentation in Sync**
+   ```bash
+   # Critical files to maintain:
+   - CLAUDE.md → Project context & priorities
+   - README.md → Developer-focused setup & usage
+   - WIDGET_INTEGRATION.md → Complete widget guide
+   - PROJECT_SUMMARY.md → Status & roadmap
+   - PROGRESS_TRACKING.md → Task completion log
+   ```
+
+3. **📋 Documentation Checklist**
+   ```bash
+   # Before completing any major task:
+   - [ ] Update relevant code examples
+   - [ ] Verify all URLs and endpoints work
+   - [ ] Update completion percentages
+   - [ ] Add new features to documentation
+   - [ ] Test all documented procedures
+   ```
+
+### 📁 Documentation File Roles
+
+| File | Purpose | Update Frequency |
+|------|---------|------------------|
+| **CLAUDE.md** | Project context, architecture, priorities | Weekly or when priorities change |
+| **README.md** | Developer setup, API usage, quick start | After significant features |
+| **WIDGET_INTEGRATION.md** | Complete widget embedding guide | When widget changes |
+| **PROJECT_SUMMARY.md** | Current status, roadmap, metrics | After major milestones |
+| **PROGRESS_TRACKING.md** | Task completion history | After every completed task |
+
+### 🔧 Documentation Maintenance Tasks
+
+**When adding new features:**
+```bash
+1. Update README.md with new API endpoints/examples
+2. Update WIDGET_INTEGRATION.md if widget functionality changes
+3. Update CLAUDE.md if architecture or priorities change
+4. Update PROJECT_SUMMARY.md completion percentages
+5. Log completion in PROGRESS_TRACKING.md
+```
+
+**When fixing bugs:**
+```bash
+1. Update examples in relevant documentation
+2. Verify all documented procedures still work
+3. Update troubleshooting sections if needed
+4. Log completion in PROGRESS_TRACKING.md
+```
+
+**Weekly documentation review:**
+```bash
+1. Verify all URLs and endpoints are functional
+2. Update completion percentages in PROJECT_SUMMARY.md
+3. Review and update CLAUDE.md priorities if needed
+4. Ensure WIDGET_INTEGRATION.md reflects current widget state
+5. Update README.md with any new development workflows
+```
+
+### 📝 Documentation Quality Standards
+
+- **Accuracy**: All code examples must be tested and working
+- **Completeness**: Cover all major use cases and scenarios
+- **Clarity**: Use clear, concise language for developers
+- **Currency**: Keep information up-to-date with current implementation
+- **Consistency**: Maintain consistent formatting and terminology
+
 ## 🚨 IMPORTANT REMINDERS
 
 1. **NEVER skip progress tracking** - Update PROGRESS_TRACKING.md after every completed task
@@ -191,6 +272,7 @@ docker-compose -f docker-compose.yml up -d
 4. **Update completion percentages** - Keep PROJECT_SUMMARY.md accurate
 5. **POPIA compliance first** - All voice/data handling must be compliant
 6. **SA legal context** - All features must work for South African law firms
+7. **MAINTAIN DOCUMENTATION** - Update relevant .md files after every significant change
 
 ---
 
