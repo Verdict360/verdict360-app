@@ -14,6 +14,7 @@
   let messages: Array<{id: string, content: string, type: 'user' | 'assistant', timestamp: Date}> = [];
   let currentMessage = '';
   let isLoading = false;
+  let messagesContainer: HTMLDivElement;
   
   // Create enhanced error message with contact information
   function createErrorMessage(userMessage: string = '') {
@@ -48,6 +49,15 @@
     return baseMessage || 'I apologize, but I\'m currently experiencing technical difficulties. Please try again or contact our support team.';
   }
   
+  // Auto-scroll to bottom of messages
+  function scrollToBottom() {
+    if (messagesContainer) {
+      setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 100);
+    }
+  }
+
   async function sendMessage() {
     if (!currentMessage.trim()) return;
     
@@ -59,6 +69,8 @@
     };
     
     messages = [...messages, userMessage];
+    scrollToBottom();
+    
     const userInput = currentMessage;
     currentMessage = '';
     isLoading = true;
@@ -82,6 +94,7 @@
       };
       
       messages = [...messages, assistantMessage];
+      scrollToBottom();
     } catch (error) {
       const errorMessage = {
         id: crypto.randomUUID(),
@@ -90,6 +103,7 @@
         timestamp: new Date()
       };
       messages = [...messages, errorMessage];
+      scrollToBottom();
     } finally {
       isLoading = false;
     }
@@ -103,7 +117,7 @@
   }
 </script>
 
-<Card class={isEmbedded ? 'h-96' : 'h-128'}>
+<Card class={isEmbedded ? 'h-96 flex flex-col' : 'h-full max-h-screen flex flex-col'}>
   <!-- Header -->
   <div class="flex items-center justify-between p-4 border-b border-legal-gray-200">
     <div class="flex items-center space-x-3">
@@ -125,7 +139,7 @@
   </div>
   
   <!-- Messages -->
-  <div class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+  <div bind:this={messagesContainer} class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
     {#if messages.length === 0}
       <div class="text-center text-legal-gray-500 py-8">
         <p class="mb-2">Welcome to Verdict360 Legal Assistant</p>

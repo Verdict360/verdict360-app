@@ -12,8 +12,10 @@
 </svelte:head>
 
 <!-- Minimal layout for embedding -->
-<div class="p-4 bg-legal-gray-50 min-h-screen">
-  <ChatWidget {isEmbedded} />
+<div class="h-screen flex flex-col bg-legal-gray-50 p-4">
+  <div class="flex-1 flex flex-col min-h-0">
+    <ChatWidget {isEmbedded} />
+  </div>
 </div>
 
 <style>
