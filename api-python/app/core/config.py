@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # API Configuration
     API_HOST: str = Field(default="0.0.0.0", env="API_HOST")
-    API_PORT: int = Field(default=8001, env="API_PORT")
+    API_PORT: int = Field(default=8000, env="API_PORT")
     API_DEBUG: bool = Field(default=True, env="API_DEBUG")
     
     
@@ -51,10 +51,12 @@ class Settings(BaseSettings):
         env="DATABASE_URL"
     )
     
-    # CORS
+    # CORS - Updated for SvelteKit
     ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        "http://localhost:5173",  # SvelteKit dev server
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",  # SvelteKit preview
+        "http://localhost:3000",  # Alternative frontend port
         "http://localhost:3001"
     ]
     

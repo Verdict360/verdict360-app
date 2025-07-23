@@ -1,14 +1,61 @@
+version: '3.8'
+
 services:
+  # SvelteKit Frontend
+  web:
+    build: 
+      context: ./web
+      target: development
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_KEYCLOAK_URL=http://localhost:8080
+    depends_on:
+      - api-python
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    networks:
+      - legal-chatbot-network
+
+  # FastAPI Backend
+  api-python:
+    build: ./api-python
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://Verdict360:${POSTGRES_PASSWORD:-password}@postgres:5432/Verdict360_legal
+      - KEYCLOAK_SERVER_URL=http://keycloak:8080
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - REDIS_URL=redis://redis:6379
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./api-python:/app
+    networks:
+      - legal-chatbot-network
+
+  # PostgreSQL Database
   postgres:
     image: postgres:15
     container_name: Verdict360-postgres
     restart: always
     environment:
       POSTGRES_USER: Verdict360
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: Verdict360_legal
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init-scripts:/docker-entrypoint-initdb.d
@@ -17,19 +64,22 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - legal-chatbot-network
 
+  # Keycloak Authentication
   keycloak:
     image: quay.io/keycloak/keycloak:21.1.1
     container_name: Verdict360-keycloak
     environment:
       KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/Verdict360_legal
       KC_DB_USERNAME: Verdict360
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
-      - '8080:8080'
+      - "8080:8080"
     volumes:
        - ./docker/keycloak/import:/opt/keycloak/data/import
        - ./docker/keycloak/themes:/opt/keycloak/themes
@@ -37,16 +87,36 @@ services:
       postgres:
         condition: service_healthy
     command: ['start-dev', '--import-realm']
+    networks:
+      - legal-chatbot-network
 
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: Verdict360-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - legal-chatbot-network
+
+  # MinIO Storage
   minio:
     image: minio/minio
     container_name: Verdict360-minio
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
@@ -55,7 +125,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 3
+    networks:
+      - legal-chatbot-network
 
+  # N8N Workflow Automation
   n8n:
     image: n8nio/n8n:latest
     container_name: Verdict360-n8n
@@ -63,14 +136,14 @@ services:
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://localhost:5678
       - GENERIC_TIMEZONE=Africa/Johannesburg
     ports:
-      - '5678:5678'
+      - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
       - ./integrations/n8n-workflows:/home/node/.n8n/workflows
@@ -81,23 +154,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-  redis:
-    image: redis:7-alpine
-    container_name: Verdict360-redis
-    restart: always
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 5s
-      timeout: 3s
-      retries: 5
+    networks:
+      - legal-chatbot-network
 
 volumes:
   postgres_data:
+  redis_data:
   minio_data:
   n8n_data:
-  redis_data:
+
+networks:
+  legal-chatbot-network:
+    driver: bridge
