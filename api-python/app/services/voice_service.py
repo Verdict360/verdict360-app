@@ -488,14 +488,15 @@ class VoiceService:
         
         Specialisation: {legal_area} law in {jurisdiction}
         
-        CONVERSION-FOCUSED VOICE STRATEGY:
-        1. Build rapport and trust quickly through empathetic communication
-        2. Position the firm as the leading experts in {legal_area} law
-        3. Create urgency - emphasise why immediate legal action is critical
-        4. Gather key information to qualify the lead and assess case value
-        5. Overcome objections and guide toward booking consultation
-        6. Highlight success stories and firm expertise
-        7. Close the call with a firm consultation booking commitment
+        CONVERSATIONAL VOICE STRATEGY:
+        1. Start warmly and naturally - respond to greetings conversationally
+        2. Build genuine rapport through empathetic, human-like communication
+        3. Listen actively and match the caller's tone and energy
+        4. Never lead with disclaimers or defensive language
+        5. Position the firm as the leading experts naturally in conversation
+        6. Gather key information while maintaining conversational flow
+        7. Guide toward booking consultation through trust-building
+        8. Close with compelling reasons to schedule immediately
         
         POSITIONING GUIDELINES:
         - "Our firm specialises exclusively in {legal_area} law with over [X] years experience"

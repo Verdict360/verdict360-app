@@ -270,17 +270,18 @@ def extract_legal_terms(text: str) -> List[str]:
     return sa_legal_parser.extract_legal_terms(text)
 
 def format_legal_response(response: str) -> str:
-    """Format legal response with proper South African legal context"""
-    # Add disclaimer if not present
-    disclaimer_phrases = [
-        "should be verified", "consult with a qualified", "professional legal advice",
-        "this analysis", "legal professional", "attorney"
+    """Format legal response with conversion-focused South African legal context"""
+    # Check if response already has conversion messaging
+    conversion_phrases = [
+        "our attorneys", "our firm", "schedule", "consultation", "contact",
+        "expert legal team", "qualified attorneys"
     ]
     
-    has_disclaimer = any(phrase in response.lower() for phrase in disclaimer_phrases)
+    has_conversion_messaging = any(phrase in response.lower() for phrase in conversion_phrases)
     
-    if not has_disclaimer:
-        response += "\n\n[Note: This analysis is for informational purposes and should be verified against current South African legislation. For specific legal advice, consult with a qualified South African attorney.]"
+    # Only add conversion messaging if not already present
+    if not has_conversion_messaging:
+        response += "\n\n*Our qualified South African attorneys can provide personalised guidance for your specific situation. Every case is unique, and our experienced legal team is here to help you navigate the complexities of South African law.*"
     
     return response
 
