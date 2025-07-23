@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdict360 Conversion Widget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #1E40AF;
+            margin-bottom: 20px;
+        }
+        .firm-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🏛️ Smith & Associates Legal - Conversion Widget Test</h1>
+        <p>Testing the client acquisition AI widget with conversion-focused responses and CTA buttons.</p>
+    </div>
+
+    <div class="test-info">
+        <h3>🧪 Test Instructions:</h3>
+        <ol>
+            <li>Click the chat widget in the bottom-right corner</li>
+            <li>Ask a legal question (e.g., "I need help with a contract dispute")</li>
+            <li>Verify the AI response includes conversion messaging</li>
+            <li>Check that <strong>Schedule Consultation</strong> and <strong>Contact Firm</strong> buttons appear</li>
+            <li>Click the buttons to test the conversion flow</li>
+        </ol>
+    </div>
+
+    <div class="firm-info">
+        <h2>Smith & Associates Legal Firm</h2>
+        <p><strong>Specialising in:</strong> Commercial Law, Contract Disputes, Corporate Legal Services</p>
+        <p><strong>Phone:</strong> +27 11 789 1234</p>
+        <p><strong>Email:</strong> info@smithlaw.co.za</p>
+        <p><strong>Emergency:</strong> +27 82 555 0123</p>
+        <p><strong>Office Hours:</strong> Monday - Friday: 8:00 AM - 6:00 PM, Saturday: 9:00 AM - 1:00 PM</p>
+    </div>
+
+    <!-- Verdict360 Conversion Widget -->
+    <script 
+        src="web/static/verdict360-widget.js" 
+        data-auto-embed="true"
+        data-firm-name="Smith & Associates Legal"
+        data-firm-logo="https://via.placeholder.com/150x60/1E40AF/FFFFFF?text=Smith+%26+Associates"
+        data-firm-phone="+27 11 789 1234"
+        data-firm-email="info@smithlaw.co.za"
+        data-emergency-phone="+27 82 555 0123"
+        data-office-hours="Monday - Friday: 8:00 AM - 6:00 PM, Saturday: 9:00 AM - 1:00 PM"
+        data-position="bottom-right"
+        data-theme="light"
+        data-color="#1E40AF"
+        data-voice-call="true"
+        data-consultation="true">
+    </script>
+</body>
+</html>

@@ -316,14 +316,19 @@ async def _call_legal_ai_model(
         return {
             'content': f"""I apologise, but I'm experiencing technical difficulties processing your legal enquiry about "{message[:100]}...".
 
-**Please try:**
-• Rephrasing your question
-• Contacting our support team
-• Scheduling a consultation with a qualified attorney
+**However, our expert attorneys are immediately available to help you!**
+
+Don't let a technical issue delay getting the legal assistance you need. Our qualified legal team can provide personalised guidance for your specific situation.
 
 **For urgent legal matters:** Contact Legal Aid South Africa at 0800 110 110
 
-*We're working to resolve this issue. Thank you for your patience.*""",
+---
+
+**Get direct access to our legal experts:**
+
+Our experienced attorneys specialise in South African law and are ready to review your case personally. Don't wait - schedule your consultation now.
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]""",
             'legal_area': 'Technical Error',
             'urgency': 'Normal',
             'confidence': 0.0,

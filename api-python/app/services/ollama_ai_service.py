@@ -21,22 +21,39 @@ class OllamaAIService:
         self.client = httpx.AsyncClient(timeout=120.0)  # 2 minute timeout for AI responses
         
         # Legal context and system prompts
-        self.system_prompt = """You are a professional South African legal assistant AI. Your role is to provide accurate, helpful legal guidance based on South African law while maintaining professional standards.
+        self.system_prompt = """You are a client acquisition AI assistant for a South African law firm. Your PRIMARY GOAL is to convert website visitors into paying clients by connecting them with the firm's expert attorneys.
 
-IMPORTANT GUIDELINES:
-- You are knowledgeable about South African legal system, including constitutional law, common law, and statutory law
-- Always provide professional, accurate legal information
-- Include relevant South African legal citations when applicable (Constitution, Acts, case law)
-- Maintain a professional, respectful tone appropriate for legal matters
-- Always include appropriate disclaimers about seeking qualified legal advice
-- For urgent/emergency matters, emphasise the need for immediate professional legal assistance
-- Be helpful but responsible - don't provide advice that could harm someone's legal position
+CONVERSION-FOCUSED APPROACH:
+- Present the firm as the leading legal experts in South Africa
+- Position the firm's attorneys as the best solution for their legal needs
+- Create urgency around getting professional legal help
+- Always guide conversations toward scheduling consultations or contacting the firm
+- Emphasise the risks of not getting proper legal representation
+- Highlight the firm's expertise, experience, and success rate
+
+CLIENT ACQUISITION STRATEGY:
+- Provide helpful legal information to build trust, then direct to firm consultation
+- After each response, include compelling reasons to schedule immediately
+- Mention the firm's specialised departments and expert attorneys
+- Create fear of missing out on quality legal representation
+- Use social proof and authority positioning
 
 LANGUAGE AND CURRENCY STANDARDS:
 - Use British/South African English spelling exclusively (customise not customize, analyse not analyze, colour not color, licence not license, centre not center, organised not organized)
 - All monetary amounts must be in South African Rand (ZAR) using format: R2,500 or R25,000 (never $ or USD)
 - Use South African legal terminology and professional titles correctly
 - Maintain consistent British English throughout all responses
+
+RESPONSE FORMAT REQUIREMENTS:
+Every response MUST end with exactly these two call-to-action buttons:
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]
+
+POSITIONING GUIDELINES:
+- "Our expert attorneys at [FIRM_NAME] specialise in..."
+- "This requires immediate attention from our experienced legal team..."
+- "Our firm has successfully handled hundreds of similar cases..."
+- "Don't risk your legal position - our qualified attorneys can help..."
+- "Time is critical in legal matters like this..."
 
 SOUTH AFRICAN LEGAL CONTEXT:
 - Legal system based on Roman-Dutch law with English law influences
@@ -172,30 +189,34 @@ Please provide a comprehensive, professional legal response following the format
         # Validate and correct language standards
         corrected_response = await self._validate_sa_english(ai_response)
         
+        # Add conversion buttons to every response
+        final_response = await self._add_conversion_buttons(corrected_response)
+        
         # Analyze response for legal area classification
-        legal_area = await self._classify_legal_area(original_query, corrected_response)
+        legal_area = await self._classify_legal_area(original_query, final_response)
         
         # Determine urgency level
-        urgency = await self._assess_urgency(original_query, corrected_response)
+        urgency = await self._assess_urgency(original_query, final_response)
         
         # Calculate confidence score based on response quality
-        confidence = await self._calculate_confidence(corrected_response)
+        confidence = await self._calculate_confidence(final_response)
         
         # Extract any legal citations mentioned
-        legal_citations = await self._extract_legal_citations(corrected_response)
+        legal_citations = await self._extract_legal_citations(final_response)
         
         # Generate sources (for now, use local legal knowledge base)
         sources = await self._generate_legal_sources(legal_area)
         
         return {
-            'content': corrected_response,
+            'content': final_response,
             'legal_area': legal_area,
             'urgency': urgency,
             'confidence': confidence,
             'legal_citations': legal_citations,
             'sources': sources,
             'model_used': self.model_name,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.utcnow().isoformat(),
+            'has_conversion_buttons': True  # Flag for widget to render buttons
         }
 
     async def _classify_legal_area(self, query: str, response: str) -> str:
@@ -320,26 +341,27 @@ Please provide a comprehensive, professional legal response following the format
         return {
             'content': f"""I apologise, but I'm experiencing technical difficulties processing your legal enquiry about "{message[:100]}...".
 
-**Please try:**
-• Rephrasing your question
-• Contacting our support team
-• Scheduling a consultation with a qualified attorney
+**However, our expert attorneys are immediately available to help you!**
+
+Don't let a technical issue delay getting the legal assistance you need. Our qualified legal team can provide personalised guidance for your specific situation.
 
 **For urgent legal matters:** Contact Legal Aid South Africa at 0800 110 110
 
-**Constitutional Rights Reminder:**
-All South Africans have fundamental rights under the Constitution, including the right to legal representation and access to courts.
+---
 
-*We're working to resolve this issue. Thank you for your patience.*
+**Get direct access to our legal experts:**
 
-Would you like me to try processing your question again?""",
+Our experienced attorneys specialise in South African law and are ready to review your case personally. Don't wait - schedule your consultation now.
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]""",
             'legal_area': 'Technical Error',
             'urgency': 'Normal',
             'confidence': 0.0,
             'legal_citations': [],
             'sources': [],
             'model_used': 'fallback',
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.utcnow().isoformat(),
+            'has_conversion_buttons': True
         }
 
     async def test_connection(self) -> bool:
@@ -428,6 +450,26 @@ Would you like me to try processing your question again?""",
         corrected = corrected.replace(' dollar', ' rand')
         
         return corrected
+
+    async def _add_conversion_buttons(self, content: str) -> str:
+        """Add schedule/contact buttons to AI response for client conversion"""
+        
+        # Check if buttons are already present to avoid duplication
+        if '[SCHEDULE_CONSULTATION]' in content or '[CONTACT_FIRM]' in content:
+            return content
+        
+        # Add compelling call-to-action with buttons
+        button_section = """
+
+---
+
+**Ready to get expert legal help?**
+
+Our experienced attorneys are standing by to review your case and provide professional guidance. Don't wait - legal matters require prompt attention.
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]"""
+        
+        return content + button_section
 
     async def close(self):
         """Close the HTTP client"""

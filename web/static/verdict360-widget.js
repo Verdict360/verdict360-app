@@ -456,6 +456,52 @@
             color: white;
         }
         
+        /* Conversion CTA Buttons */
+        .verdict360-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            margin: 8px 4px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .verdict360-cta-btn.schedule-btn {
+            background: ${config.primaryColor};
+            color: white;
+        }
+        
+        .verdict360-cta-btn.schedule-btn:hover {
+            background: ${config.primaryColor}dd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .verdict360-cta-btn.contact-btn {
+            background: white;
+            color: ${config.primaryColor};
+            border: 2px solid ${config.primaryColor};
+        }
+        
+        .verdict360-cta-btn.contact-btn:hover {
+            background: ${config.primaryColor};
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .verdict360-cta-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
         /* Mobile responsive */
         @media (max-width: 480px) {
             .verdict360-widget-panel {
@@ -523,13 +569,39 @@
     }
   }
 
-  // Format message content (handle links, basic formatting)
+  // Format message content (handle links, basic formatting, and conversion buttons)
   function formatMessageContent(content) {
-    return content
+    let formatted = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
       .replace(/\n/g, '<br>');
+
+    // Replace conversion buttons with actual clickable buttons
+    formatted = formatted.replace(
+      /\[SCHEDULE_CONSULTATION\]/g,
+      `<button class="verdict360-cta-btn schedule-btn" onclick="scheduleConsultation()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Schedule Consultation
+      </button>`
+    );
+
+    formatted = formatted.replace(
+      /\[CONTACT_FIRM\]/g,
+      `<button class="verdict360-cta-btn contact-btn" onclick="contactFirm()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Contact Firm
+      </button>`
+    );
+
+    return formatted;
   }
 
   // Generate enhanced error message with contact information
@@ -723,6 +795,89 @@
     };
 
     addMessage(bookingMessage);
+  }
+
+  // Handle schedule consultation button click (conversion-focused)
+  function scheduleConsultation() {
+    const scheduleMessage = {
+      id: 'schedule_cta_' + Date.now(),
+      content: `🎯 **Excellent choice!** Our expert attorneys are ready to help you.
+
+**${config.firmName || 'Our firm'} specialises in:**
+• Constitutional Law & Human Rights  
+• Commercial & Contract Law
+• Criminal Defence & Bail Applications
+• Family Law & Divorce Proceedings
+• Property & Conveyancing
+• Labour & Employment Law
+
+**📞 Call us now:** ${config.firmPhone || '+27 11 123 4567'}
+**✉️ Email:** ${config.firmEmail || 'info@firm.co.za'}
+
+⏰ **Available appointment times:**
+• Today: 2:00 PM - 5:00 PM
+• Tomorrow: 9:00 AM - 4:00 PM  
+• This week: Multiple slots available
+
+*Our qualified attorneys have a 95% success rate and offer free initial consultations for qualifying cases.*`,
+      type: 'assistant',
+      timestamp: new Date(),
+    };
+
+    addMessage(scheduleMessage);
+    
+    // Trigger analytics event
+    if (window.gtag) {
+      gtag('event', 'schedule_consultation_clicked', {
+        'event_category': 'Legal Widget Conversion',
+        'event_label': 'CTA Button Click'
+      });
+    }
+  }
+
+  // Handle contact firm button click (conversion-focused)
+  function contactFirm() {
+    const contactMessage = {
+      id: 'contact_cta_' + Date.now(),
+      content: `📞 **Connect with ${config.firmName || 'our expert legal team'} immediately:**
+
+**🚨 URGENT LEGAL MATTERS:**
+**Call now:** ${config.firmPhone || '+27 11 123 4567'}
+*(Available 24/7 for emergencies)*
+
+**📧 EMAIL CONSULTATION:**
+Send details to: ${config.firmEmail || 'info@firm.co.za'}
+*We respond within 2 hours during business hours*
+
+**🏢 OFFICE HOURS:**
+${config.officeHours || 'Monday - Friday: 8:00 AM - 5:00 PM'}
+
+**💬 WhatsApp Legal Advice:**
+Send "LEGAL HELP" to ${config.emergencyPhone || '+27 82 123 4567'}
+
+---
+
+**⚖️ Why choose ${config.firmName || 'our firm'}?**
+✅ 20+ years combined experience  
+✅ Qualified attorneys admitted to the High Court  
+✅ No-win, no-fee options available  
+✅ Free 15-minute phone consultations  
+✅ Same-day emergency appointments  
+
+*Don't let legal problems get worse - our attorneys are standing by to help you now.*`,
+      type: 'assistant',
+      timestamp: new Date(),
+    };
+
+    addMessage(contactMessage);
+    
+    // Trigger analytics event
+    if (window.gtag) {
+      gtag('event', 'contact_firm_clicked', {
+        'event_category': 'Legal Widget Conversion',
+        'event_label': 'CTA Button Click'
+      });
+    }
   }
 
   // Toggle widget open/closed
