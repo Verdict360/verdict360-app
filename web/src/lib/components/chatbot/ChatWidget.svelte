@@ -65,7 +65,8 @@
     
     try {
       // Connect to FastAPI backend simple chat endpoint
-      const response = await fetch('/api/v1/simple-chat/', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/v1/simple-chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userInput })

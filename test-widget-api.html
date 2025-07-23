@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Widget API Test</h1>
+    
+    <button onclick="testSvelteKitWidget()">Test SvelteKit Widget API</button>
+    <button onclick="testStaticWidget()">Test Static Widget API</button>
+    <button onclick="testDirectAPI()">Test Direct API</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        async function testSvelteKitWidget() {
+            resultDiv.innerHTML = '<p>🔄 Testing SvelteKit Widget API...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/simple-chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'What is contract law?' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ SvelteKit Widget API: WORKING</p>
+                        <p><strong>Response:</strong> ${data.response.substring(0, 200)}...</p>
+                        <p><strong>Session ID:</strong> ${data.session_id}</p>
+                        <p><strong>Legal Area:</strong> ${data.legal_area}</p>
+                        <p><strong>Confidence:</strong> ${data.confidence}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<p class="error">❌ No response from API</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ SvelteKit Widget API Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testStaticWidget() {
+            resultDiv.innerHTML = '<p>🔄 Testing Static Widget API...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/simple-chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'cors',
+                    credentials: 'omit',
+                    body: JSON.stringify({
+                        message: 'What is contract law?',
+                        session_id: 'test_session_' + Date.now(),
+                        context: {
+                            firm_name: 'Test Law Firm',
+                            widget_version: '1.0.0',
+                            page_url: window.location.href
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Static Widget API: WORKING</p>
+                        <p><strong>Response:</strong> ${data.response.substring(0, 200)}...</p>
+                        <p><strong>Session ID:</strong> ${data.session_id}</p>
+                        <p><strong>Legal Area:</strong> ${data.legal_area}</p>
+                        <p><strong>Confidence:</strong> ${data.confidence}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<p class="error">❌ No response from API</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Static Widget API Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testDirectAPI() {
+            resultDiv.innerHTML = '<p>🔄 Testing Direct API call...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/simple-chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Test message' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Direct API: WORKING</p>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Response:</strong> ${data.response ? data.response.substring(0, 100) + '...' : 'No response'}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p class="error">❌ Direct API Error: ${response.status} ${response.statusText}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Direct API Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

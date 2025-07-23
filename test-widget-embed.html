@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Firm Website - Widget Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .law-firm-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .widget-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 400px;
+            height: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        h1 { color: #1e293b; }
+        h2 { color: #475569; }
+        .cta-section {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="law-firm-content">
+        <h1>🏛️ Smith & Associates Legal</h1>
+        <h2>Leading Legal Experts in South Africa</h2>
+        
+        <p>Welcome to our law firm. We specialize in corporate law, contract disputes, and legal consultation services throughout South Africa.</p>
+        
+        <div class="cta-section">
+            <h3>Need Legal Assistance?</h3>
+            <p>Our AI legal assistant is available 24/7 to help with your legal questions. Try the chat widget on the bottom right!</p>
+        </div>
+        
+        <h3>Our Services</h3>
+        <ul>
+            <li>Corporate Law & Business Formation</li>
+            <li>Contract Review & Dispute Resolution</li>
+            <li>Employment Law & Labor Relations</li>
+            <li>Intellectual Property Protection</li>
+            <li>Litigation & Court Representation</li>
+        </ul>
+        
+        <h3>Why Choose Our AI Legal Assistant?</h3>
+        <p>Get instant answers to common legal questions, schedule consultations, and receive preliminary legal guidance - all powered by our advanced AI trained on South African law.</p>
+    </div>
+
+    <!-- Embedded Verdict360 Legal Chatbot Widget -->
+    <div class="widget-container">
+        <iframe 
+            src="http://localhost:5173/widget" 
+            title="Legal Chatbot Assistant"
+            allow="microphone; camera">
+        </iframe>
+    </div>
+</body>
+</html>

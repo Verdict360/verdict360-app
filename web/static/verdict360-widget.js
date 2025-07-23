@@ -604,6 +604,8 @@
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors', // Explicitly enable CORS
+        credentials: 'omit', // Don't send credentials for cross-origin
         body: JSON.stringify({
           message: content,
           session_id: sessionId,
