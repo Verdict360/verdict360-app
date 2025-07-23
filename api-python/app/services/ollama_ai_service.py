@@ -1,0 +1,362 @@
+"""
+Ollama AI Service for Legal Chat Responses
+Integrates with local Ollama instance running Llama models for real legal AI responses
+"""
+
+import asyncio
+import json
+import logging
+from typing import Dict, List, Any, Optional
+import httpx
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+class OllamaAIService:
+    """AI service using local Ollama instance for legal responses"""
+    
+    def __init__(self, model_name: str = "llama3.2:latest", base_url: str = "http://localhost:11434"):
+        self.model_name = model_name
+        self.base_url = base_url
+        self.client = httpx.AsyncClient(timeout=120.0)  # 2 minute timeout for AI responses
+        
+        # Legal context and system prompts
+        self.system_prompt = """You are a professional South African legal assistant AI. Your role is to provide accurate, helpful legal guidance based on South African law while maintaining professional standards.
+
+IMPORTANT GUIDELINES:
+- You are knowledgeable about South African legal system, including constitutional law, common law, and statutory law
+- Always provide professional, accurate legal information
+- Include relevant South African legal citations when applicable (Constitution, Acts, case law)
+- Maintain a professional, respectful tone appropriate for legal matters
+- Always include appropriate disclaimers about seeking qualified legal advice
+- For urgent/emergency matters, emphasize the need for immediate professional legal assistance
+- Be helpful but responsible - don't provide advice that could harm someone's legal position
+
+SOUTH AFRICAN LEGAL CONTEXT:
+- Legal system based on Roman-Dutch law with English law influences
+- Constitution of South Africa, 1996 is the supreme law
+- Court hierarchy: Magistrates' Courts, High Courts, Supreme Court of Appeal, Constitutional Court
+- Major legal areas: Constitutional, Criminal, Civil, Commercial, Family, Property, Labour, Administrative law
+
+FORMAT YOUR RESPONSES WITH:
+1. Direct answer to the legal question
+2. Relevant legal framework/citations
+3. Practical next steps
+4. Professional disclaimer
+5. Offer for further assistance
+
+Remember: Provide general legal guidance, not specific legal advice. Always recommend consulting with qualified attorneys for specific legal matters."""
+
+    async def generate_response(
+        self, 
+        message: str, 
+        context: List[Dict] = None,
+        conversation_history: str = "",
+        legal_matter: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Generate AI response using Ollama"""
+        
+        try:
+            # Build comprehensive prompt with legal context
+            full_prompt = await self._build_legal_prompt(
+                user_message=message,
+                context=context or [],
+                conversation_history=conversation_history,
+                legal_matter=legal_matter
+            )
+            
+            logger.info(f"Generating AI response for legal query: {message[:100]}...")
+            
+            # Call Ollama API
+            ai_response = await self._call_ollama(full_prompt)
+            
+            # Process and validate response
+            processed_response = await self._process_legal_response(ai_response, message)
+            
+            return processed_response
+            
+        except Exception as e:
+            logger.error(f"Error generating AI response: {str(e)}")
+            return await self._get_fallback_response(message)
+
+    async def _build_legal_prompt(
+        self,
+        user_message: str,
+        context: List[Dict],
+        conversation_history: str,
+        legal_matter: Optional[str]
+    ) -> str:
+        """Build comprehensive legal prompt for the AI"""
+        
+        # Extract legal context from vector search results
+        context_str = ""
+        if context:
+            context_str = "\n\nRELEVANT LEGAL CONTEXT:\n"
+            for i, item in enumerate(context[:3], 1):
+                context_str += f"{i}. {item.get('title', 'Legal Document')}\n"
+                context_str += f"   Citation: {item.get('citation', 'N/A')}\n"
+                context_str += f"   Content: {item.get('excerpt', item.get('content', ''))[:200]}...\n\n"
+        
+        # Include conversation history if available
+        history_str = ""
+        if conversation_history:
+            history_str = f"\n\nPREVIOUS CONVERSATION CONTEXT:\n{conversation_history}\n"
+        
+        # Legal matter context
+        matter_str = ""
+        if legal_matter:
+            matter_str = f"\n\nLEGAL MATTER TYPE: {legal_matter}\n"
+        
+        # Determine urgency and special handling
+        urgency_context = ""
+        if any(word in user_message.lower() for word in ['emergency', 'urgent', 'arrest', 'court date', 'deadline']):
+            urgency_context = "\n\nURGENT MATTER DETECTED: This appears to be time-sensitive. Emphasize immediate professional legal assistance.\n"
+        
+        # Build complete prompt
+        full_prompt = f"""{self.system_prompt}
+
+{context_str}{history_str}{matter_str}{urgency_context}
+
+USER QUESTION: {user_message}
+
+Please provide a comprehensive, professional legal response following the format guidelines above."""
+        
+        return full_prompt
+
+    async def _call_ollama(self, prompt: str) -> str:
+        """Make API call to Ollama"""
+        
+        try:
+            payload = {
+                "model": self.model_name,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.3,  # Lower temperature for more consistent legal responses
+                    "top_p": 0.9,
+                    "top_k": 40,
+                    "num_predict": 1500,  # Longer responses for comprehensive legal guidance
+                }
+            }
+            
+            response = await self.client.post(
+                f"{self.base_url}/api/generate",
+                json=payload
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"Ollama API error: {response.status_code} - {response.text}")
+            
+            result = response.json()
+            ai_response = result.get('response', '').strip()
+            
+            if not ai_response:
+                raise Exception("Empty response from Ollama")
+            
+            logger.info(f"Generated AI response ({len(ai_response)} chars)")
+            return ai_response
+            
+        except Exception as e:
+            logger.error(f"Ollama API call failed: {str(e)}")
+            raise
+
+    async def _process_legal_response(self, ai_response: str, original_query: str) -> Dict[str, Any]:
+        """Process and validate AI response for legal appropriateness"""
+        
+        # Analyze response for legal area classification
+        legal_area = await self._classify_legal_area(original_query, ai_response)
+        
+        # Determine urgency level
+        urgency = await self._assess_urgency(original_query, ai_response)
+        
+        # Calculate confidence score based on response quality
+        confidence = await self._calculate_confidence(ai_response)
+        
+        # Extract any legal citations mentioned
+        legal_citations = await self._extract_legal_citations(ai_response)
+        
+        # Generate sources (for now, use local legal knowledge base)
+        sources = await self._generate_legal_sources(legal_area)
+        
+        return {
+            'content': ai_response,
+            'legal_area': legal_area,
+            'urgency': urgency,
+            'confidence': confidence,
+            'legal_citations': legal_citations,
+            'sources': sources,
+            'model_used': self.model_name,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+
+    async def _classify_legal_area(self, query: str, response: str) -> str:
+        """Classify the legal area based on query and response"""
+        
+        classifications = {
+            'criminal': ['criminal', 'arrest', 'bail', 'court', 'charge', 'police', 'rights', 'detention'],
+            'family': ['divorce', 'custody', 'maintenance', 'marriage', 'spouse', 'children', 'alimony'],
+            'commercial': ['business', 'company', 'contract', 'commercial', 'employment', 'labour'],
+            'property': ['property', 'house', 'buying', 'selling', 'transfer', 'bond', 'lease', 'rent'],
+            'civil': ['civil', 'litigation', 'damages', 'dispute', 'claim', 'personal injury'],
+            'constitutional': ['constitutional', 'rights', 'bill of rights', 'equality', 'dignity'],
+            'administrative': ['administrative', 'government', 'public', 'municipal', 'licensing']
+        }
+        
+        query_lower = (query + ' ' + response).lower()
+        
+        for area, keywords in classifications.items():
+            if any(keyword in query_lower for keyword in keywords):
+                return area.title() + ' Law'
+        
+        return 'General Legal Inquiry'
+
+    async def _assess_urgency(self, query: str, response: str) -> str:
+        """Assess urgency level of the legal matter"""
+        
+        critical_keywords = ['emergency', 'urgent', 'arrest', 'detention', 'court date', 'deadline', 'eviction']
+        high_keywords = ['criminal', 'bail', 'custody', 'restraining order', 'foreclosure']
+        
+        text_lower = (query + ' ' + response).lower()
+        
+        if any(keyword in text_lower for keyword in critical_keywords):
+            return 'Critical'
+        elif any(keyword in text_lower for keyword in high_keywords):
+            return 'High'
+        else:
+            return 'Normal'
+
+    async def _calculate_confidence(self, response: str) -> float:
+        """Calculate confidence score based on response quality indicators"""
+        
+        confidence = 0.7  # Base confidence
+        
+        # Boost confidence for legal indicators
+        if 'Constitution' in response:
+            confidence += 0.05
+        if 'Act' in response and any(char.isdigit() for char in response):
+            confidence += 0.05
+        if 'legal advice' in response or 'attorney' in response:
+            confidence += 0.05
+        if len(response) > 300:  # Comprehensive response
+            confidence += 0.05
+        if 'South Africa' in response:
+            confidence += 0.05
+        
+        return min(confidence, 0.95)  # Cap at 95%
+
+    async def _extract_legal_citations(self, response: str) -> List[str]:
+        """Extract legal citations from the response"""
+        
+        import re
+        citations = []
+        
+        # Common SA legal citation patterns
+        patterns = [
+            r'Constitution of.*?\d{4}',
+            r'Act \d+ of \d{4}',
+            r'Section \d+.*?Constitution',
+            r'Chapter \d+.*?Constitution',
+            r'\d{4} \(\d+\) SA \d+',  # Case citations
+            r'Criminal Procedure Act.*?\d+',
+            r'Companies Act.*?\d+',
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, response, re.IGNORECASE)
+            citations.extend(matches)
+        
+        return list(set(citations))  # Remove duplicates
+
+    async def _generate_legal_sources(self, legal_area: str) -> List[Dict]:
+        """Generate relevant legal sources based on legal area"""
+        
+        sources_map = {
+            'Criminal Law': [
+                {
+                    'title': 'Constitution of South Africa - Chapter 2',
+                    'citation': 'Constitution of the Republic of South Africa, 1996',
+                    'relevance_score': 0.95
+                },
+                {
+                    'title': 'Criminal Procedure Act',
+                    'citation': 'Criminal Procedure Act 51 of 1977',
+                    'relevance_score': 0.90
+                }
+            ],
+            'Family Law': [
+                {
+                    'title': 'Divorce Act',
+                    'citation': 'Divorce Act 70 of 1979',
+                    'relevance_score': 0.92
+                },
+                {
+                    'title': 'Children\'s Act',
+                    'citation': 'Children\'s Act 38 of 2005',
+                    'relevance_score': 0.88
+                }
+            ]
+        }
+        
+        return sources_map.get(legal_area, [
+            {
+                'title': 'Constitution of South Africa',
+                'citation': 'Constitution of the Republic of South Africa, 1996',
+                'relevance_score': 0.80
+            }
+        ])
+
+    async def _get_fallback_response(self, message: str) -> Dict[str, Any]:
+        """Generate fallback response when AI fails"""
+        
+        return {
+            'content': f"""I apologize, but I'm experiencing technical difficulties processing your legal inquiry about "{message[:100]}...".
+
+**Please try:**
+• Rephrasing your question
+• Contacting our support team
+• Scheduling a consultation with a qualified attorney
+
+**For urgent legal matters:** Contact Legal Aid South Africa at 0800 110 110
+
+**Constitutional Rights Reminder:**
+All South Africans have fundamental rights under the Constitution, including the right to legal representation and access to courts.
+
+*We're working to resolve this issue. Thank you for your patience.*
+
+Would you like me to try processing your question again?""",
+            'legal_area': 'Technical Error',
+            'urgency': 'Normal',
+            'confidence': 0.0,
+            'legal_citations': [],
+            'sources': [],
+            'model_used': 'fallback',
+            'timestamp': datetime.utcnow().isoformat()
+        }
+
+    async def test_connection(self) -> bool:
+        """Test connection to Ollama service"""
+        try:
+            response = await self.client.get(f"{self.base_url}/api/tags")
+            return response.status_code == 200
+        except Exception as e:
+            logger.error(f"Ollama connection test failed: {str(e)}")
+            return False
+
+    async def list_available_models(self) -> List[str]:
+        """List available models in Ollama"""
+        try:
+            response = await self.client.get(f"{self.base_url}/api/tags")
+            if response.status_code == 200:
+                data = response.json()
+                return [model['name'] for model in data.get('models', [])]
+            return []
+        except Exception as e:
+            logger.error(f"Failed to list models: {str(e)}")
+            return []
+
+    async def close(self):
+        """Close the HTTP client"""
+        await self.client.aclose()
+
+# Global instance for use in endpoints
+ollama_ai_service = OllamaAIService()

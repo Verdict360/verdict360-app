@@ -4,7 +4,7 @@ Combines all API endpoints for legal document processing, chat, and consultation
 """
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import search, documents, chat, consultation, voice, webhooks, analytics, calendar
+from app.api.v1.endpoints import search, documents, chat, consultation, voice, webhooks, analytics, calendar, simple_chat
 
 api_router = APIRouter()
 
@@ -12,6 +12,7 @@ api_router = APIRouter()
 api_router.include_router(search.router, prefix="/search", tags=["Legal Search & Chat"])
 api_router.include_router(documents.router, prefix="/documents", tags=["Document Management"])
 api_router.include_router(chat.router, prefix="/chat", tags=["Legal AI Chat"])
+api_router.include_router(simple_chat.router, prefix="/simple-chat", tags=["Demo Chat API"])
 api_router.include_router(consultation.router, prefix="/consultations", tags=["Consultation Booking"])
 api_router.include_router(voice.router, prefix="/voice", tags=["Voice Integration"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics & Dashboard"])

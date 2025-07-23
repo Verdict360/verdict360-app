@@ -1,0 +1,74 @@
+"""
+Simple Chat API for Demo Purposes
+Provides immediate chat responses without complex database setup
+"""
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
+import logging
+import uuid
+from datetime import datetime
+
+from app.services.ollama_ai_service import ollama_ai_service
+
+router = APIRouter()
+logger = logging.getLogger(__name__)
+
+class SimpleChatRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+
+class SimpleChatResponse(BaseModel):
+    response: str
+    session_id: str
+    timestamp: str
+    legal_area: Optional[str] = None
+    urgency: Optional[str] = None
+    confidence: Optional[float] = None
+
+@router.post("/", response_model=SimpleChatResponse)
+async def simple_chat(request: SimpleChatRequest):
+    """
+    Simple chat endpoint for immediate demo responses.
+    No database or complex processing required.
+    """
+    try:
+        # Generate session ID if not provided
+        session_id = request.session_id or str(uuid.uuid4())
+        
+        logger.info(f"Processing simple chat message: {request.message[:50]}...")
+        
+        # Get AI response from Ollama (real AI)
+        ai_response = await ollama_ai_service.generate_response(
+            message=request.message,
+            context=[],
+            conversation_history="",
+            legal_matter=None
+        )
+        
+        return SimpleChatResponse(
+            response=ai_response.get('content', 'Unable to generate response'),
+            session_id=session_id,
+            timestamp=datetime.utcnow().isoformat(),
+            legal_area=ai_response.get('legal_area'),
+            urgency=ai_response.get('urgency'),
+            confidence=ai_response.get('confidence')
+        )
+        
+    except Exception as e:
+        logger.error(f"Simple chat error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="I apologize, but I'm experiencing technical difficulties. Please try again or contact our support team."
+        )
+
+@router.get("/health")
+async def chat_health():
+    """Health check for chat service"""
+    return {
+        "status": "healthy",
+        "service": "simple_chat",
+        "timestamp": datetime.utcnow().isoformat()
+    }

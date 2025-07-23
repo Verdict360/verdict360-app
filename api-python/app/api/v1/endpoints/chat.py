@@ -265,26 +265,25 @@ async def _generate_legal_response(
     legal_citations = extract_legal_citations(message)
     legal_terms = extract_legal_terms(message)
     
-    # Generate AI response (placeholder - integrate with your AI model)
-    ai_content = await _call_legal_ai_model(
+    # Generate AI response using demo AI service
+    ai_response_data = await _call_legal_ai_model(
         message=message,
         context=legal_context,
         conversation_history=conversation.get_recent_context(),
         legal_matter=conversation.legal_matter_context
     )
     
-    # Apply SA legal formatting
-    formatted_response = format_legal_response(
-        ai_content,
-        legal_citations,
-        legal_terms
-    )
+    # Merge legal context with AI sources
+    all_sources = legal_context + ai_response_data.get('sources', [])
+    all_citations = list(set(legal_citations + ai_response_data.get('legal_citations', [])))
     
     return {
-        "content": formatted_response,
-        "sources": legal_context,
-        "legal_citations": legal_citations,
-        "confidence": 0.85,  # Placeholder confidence score
+        "content": ai_response_data.get('content', 'Unable to generate response'),
+        "sources": all_sources,
+        "legal_citations": all_citations,
+        "confidence": ai_response_data.get('confidence', 0.0),
+        "legal_area": ai_response_data.get('legal_area', 'General'),
+        "urgency": ai_response_data.get('urgency', 'Normal'),
         "qa_score": 0.0  # Will be calculated in background
     }
 
@@ -293,50 +292,44 @@ async def _call_legal_ai_model(
     context: List[Dict],
     conversation_history: str,
     legal_matter: Optional[str]
-) -> str:
+) -> Dict[str, Any]:
     """
-    Placeholder for AI model integration.
-    Replace with your preferred AI service (OpenAI, Anthropic, etc.)
+    Generate legal AI response using demo service.
+    For production, replace with your preferred AI service (OpenAI, Anthropic, etc.)
     """
+    from app.services.demo_ai_service import demo_ai_service
     
-    # Build legal context prompt
-    context_str = "\n".join([
-        f"- {item['title']}: {item['excerpt']}"
-        for item in context[:3]
-    ])
-    
-    legal_prompt = f"""
-    You are a professional South African legal assistant. Provide accurate, 
-    professional legal guidance based on South African law.
-    
-    Context from legal database:
-    {context_str}
-    
-    Previous conversation:
-    {conversation_history}
-    
-    Legal matter context: {legal_matter or "General legal inquiry"}
-    
-    User question: {message}
-    
-    Provide a professional response with:
-    1. Direct answer to the legal question
-    2. Relevant South African legal citations where applicable
-    3. Professional disclaimer about seeking qualified legal advice
-    4. Next steps recommendation if appropriate
-    """
-    
-    # Placeholder response - integrate with actual AI service
-    return f"""Based on South African law, regarding your question about {message[:50]}..., 
-    
-I can provide the following guidance:
+    try:
+        # Use demo AI service for realistic responses
+        response_data = await demo_ai_service.generate_response(
+            message=message,
+            context=context,
+            conversation_history=conversation_history,
+            legal_matter=legal_matter
+        )
+        
+        return response_data
+        
+    except Exception as e:
+        logger.error(f"AI service error: {str(e)}")
+        # Fallback response
+        return {
+            'content': f"""I apologize, but I'm experiencing technical difficulties processing your legal inquiry about "{message[:100]}...".
 
-[This is a placeholder response. Integrate with your preferred AI service here.]
+**Please try:**
+• Rephrasing your question
+• Contacting our support team
+• Scheduling a consultation with a qualified attorney
 
-Please note: This information is for general guidance only. For specific legal matters, 
-always consult with a qualified South African attorney.
+**For urgent legal matters:** Contact Legal Aid South Africa at 0800 110 110
 
-Would you like me to help you find a qualified legal professional for a consultation?"""
+*We're working to resolve this issue. Thank you for your patience.*""",
+            'legal_area': 'Technical Error',
+            'urgency': 'Normal',
+            'confidence': 0.0,
+            'sources': [],
+            'legal_citations': []
+        }
 
 async def _generate_streaming_response(request: ChatRequest):
     """Generate streaming response chunks for real-time chat."""
