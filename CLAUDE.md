@@ -5,7 +5,7 @@
 **Verdict360 AI Legal Chatbot Platform** - A comprehensive SaaS solution for law firms providing AI-powered client engagement through web chat widgets, voice calls, consultation booking, and comprehensive legal knowledge integration.
 
 ### Key Business Metrics
-- **Target Revenue**: $1,000-$2,000 monthly subscriptions per firm
+- **Target Revenue**: R5,000-R10,000 monthly subscriptions per firm
 - **Primary Market**: Law firms seeking AI-powered client engagement
 - **ROI Potential**: 300-1,500% proven returns
 - **Timeline**: 4-6 weeks to market-ready platform
@@ -196,6 +196,10 @@ docker-compose -f docker-compose.yml up -d
    - Widget changes → Update WIDGET_INTEGRATION.md
    - Architecture changes → Update CLAUDE.md technical section
    - New features → Update PROJECT_SUMMARY.md completion %
+   
+   # IMPORTANT: South African English Standards
+   - ✅ CHANGE: User-facing text, UI messages, documentation narrative
+   - ⛔ DON'T CHANGE: Code keywords, HTML attributes, CSS properties
    ```
 
 2. **🔄 Keep Documentation in Sync**
@@ -211,11 +215,13 @@ docker-compose -f docker-compose.yml up -d
 3. **📋 Documentation Checklist**
    ```bash
    # Before completing any major task:
-   - [ ] Update relevant code examples
+   - [ ] Update relevant code examples (keep standard coding conventions)
    - [ ] Verify all URLs and endpoints work
    - [ ] Update completion percentages
    - [ ] Add new features to documentation
    - [ ] Test all documented procedures
+   - [ ] Apply South African English to user-facing content only
+   - [ ] Keep ZAR currency format (R5,000 not $5,000)
    ```
 
 ### 📁 Documentation File Roles
@@ -227,6 +233,7 @@ docker-compose -f docker-compose.yml up -d
 | **WIDGET_INTEGRATION.md** | Complete widget embedding guide | When widget changes |
 | **PROJECT_SUMMARY.md** | Current status, roadmap, metrics | After major milestones |
 | **PROGRESS_TRACKING.md** | Task completion history | After every completed task |
+| **SA_ENGLISH_STYLE_GUIDE.md** | British English and ZAR currency standards | When style requirements change |
 
 ### 🔧 Documentation Maintenance Tasks
 
@@ -273,6 +280,9 @@ docker-compose -f docker-compose.yml up -d
 5. **POPIA compliance first** - All voice/data handling must be compliant
 6. **SA legal context** - All features must work for South African law firms
 7. **MAINTAIN DOCUMENTATION** - Update relevant .md files after every significant change
+8. **USE SOUTH AFRICAN ENGLISH** - Follow SA_ENGLISH_STYLE_GUIDE.md for spelling, currency (ZAR), and legal terminology
+   - ✅ **CHANGE**: User-facing content, UI text, documentation narrative, error messages
+   - ⛔ **DON'T CHANGE**: Code properties, HTML attributes, CSS properties, framework terms
 
 ---
 

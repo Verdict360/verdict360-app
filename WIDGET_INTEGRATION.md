@@ -39,7 +39,7 @@ Add this single line to your website:
   data-firm-email="info@smithlaw.co.za"
   data-position="bottom-right"
   data-theme="light"
-  data-color="#1E40AF">
+  data-color="#1E40AF"
 </script>
 ```
 
@@ -109,7 +109,7 @@ Add this single line to your website:
       data-office-hours="Monday - Friday: 8:00 AM - 6:00 PM, Saturday: 9:00 AM - 1:00 PM"
       data-position="bottom-right"
       data-theme="light"
-      data-color="#2563EB">
+      data-color="#2563EB"
     </script>
 </body>
 </html>
@@ -241,7 +241,7 @@ window.addEventListener('verdict360-message-sent', function(event) {
   src="http://localhost:5173/verdict360-widget.js" 
   data-auto-embed="true"
   data-theme="dark"
-  data-color="#EF4444">
+  data-color="#EF4444"
 </script>
 
 <style>

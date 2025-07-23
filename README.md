@@ -11,7 +11,7 @@
 - 🧪 **[Testing Guide](#testing--validation)** - Quality assurance
 - 🚀 **[Production Deploy](#production-deployment)** - Deployment guide
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENCE)
 [![Python](https://img.shields.io/badge/python-3.11+-green.svg)](https://python.org)
 [![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)](https://typescriptlang.org)
 [![SvelteKit](https://img.shields.io/badge/sveltekit-2.0+-orange.svg)](https://kit.svelte.dev)
@@ -491,9 +491,9 @@ git push origin feature/name # Push for PR
 - 📅 Mobile app (React Native)
 - 📅 Legal document automation
 
-## 📄 License
+## 📄 Licence
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT Licence - see [LICENCE](LICENCE) file for details.
 
 ## 📞 Support
 
