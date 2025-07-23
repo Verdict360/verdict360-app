@@ -29,8 +29,14 @@ IMPORTANT GUIDELINES:
 - Include relevant South African legal citations when applicable (Constitution, Acts, case law)
 - Maintain a professional, respectful tone appropriate for legal matters
 - Always include appropriate disclaimers about seeking qualified legal advice
-- For urgent/emergency matters, emphasize the need for immediate professional legal assistance
+- For urgent/emergency matters, emphasise the need for immediate professional legal assistance
 - Be helpful but responsible - don't provide advice that could harm someone's legal position
+
+LANGUAGE AND CURRENCY STANDARDS:
+- Use British/South African English spelling exclusively (customise not customize, analyse not analyze, colour not color, licence not license, centre not center, organised not organized)
+- All monetary amounts must be in South African Rand (ZAR) using format: R2,500 or R25,000 (never $ or USD)
+- Use South African legal terminology and professional titles correctly
+- Maintain consistent British English throughout all responses
 
 SOUTH AFRICAN LEGAL CONTEXT:
 - Legal system based on Roman-Dutch law with English law influences
@@ -163,23 +169,26 @@ Please provide a comprehensive, professional legal response following the format
     async def _process_legal_response(self, ai_response: str, original_query: str) -> Dict[str, Any]:
         """Process and validate AI response for legal appropriateness"""
         
+        # Validate and correct language standards
+        corrected_response = await self._validate_sa_english(ai_response)
+        
         # Analyze response for legal area classification
-        legal_area = await self._classify_legal_area(original_query, ai_response)
+        legal_area = await self._classify_legal_area(original_query, corrected_response)
         
         # Determine urgency level
-        urgency = await self._assess_urgency(original_query, ai_response)
+        urgency = await self._assess_urgency(original_query, corrected_response)
         
         # Calculate confidence score based on response quality
-        confidence = await self._calculate_confidence(ai_response)
+        confidence = await self._calculate_confidence(corrected_response)
         
         # Extract any legal citations mentioned
-        legal_citations = await self._extract_legal_citations(ai_response)
+        legal_citations = await self._extract_legal_citations(corrected_response)
         
         # Generate sources (for now, use local legal knowledge base)
         sources = await self._generate_legal_sources(legal_area)
         
         return {
-            'content': ai_response,
+            'content': corrected_response,
             'legal_area': legal_area,
             'urgency': urgency,
             'confidence': confidence,
@@ -309,7 +318,7 @@ Please provide a comprehensive, professional legal response following the format
         """Generate fallback response when AI fails"""
         
         return {
-            'content': f"""I apologize, but I'm experiencing technical difficulties processing your legal inquiry about "{message[:100]}...".
+            'content': f"""I apologise, but I'm experiencing technical difficulties processing your legal enquiry about "{message[:100]}...".
 
 **Please try:**
 • Rephrasing your question
@@ -353,6 +362,72 @@ Would you like me to try processing your question again?""",
         except Exception as e:
             logger.error(f"Failed to list models: {str(e)}")
             return []
+
+    async def _validate_sa_english(self, content: str) -> str:
+        """Validate and correct South African English spelling and currency"""
+        
+        # Common American to British English corrections
+        corrections = {
+            # Spelling corrections
+            'customize': 'customise',
+            'customized': 'customised',
+            'customizing': 'customising',
+            'analyze': 'analyse',
+            'analyzed': 'analysed',
+            'analyzing': 'analysing',
+            'organize': 'organise',
+            'organized': 'organised',
+            'organizing': 'organising',
+            'realize': 'realise',
+            'realized': 'realised',
+            'realizing': 'realising',
+            'recognize': 'recognise',
+            'recognized': 'recognised',
+            'recognizing': 'recognising',
+            'specialize': 'specialise',
+            'specialized': 'specialised',
+            'specializing': 'specialising',
+            'optimize': 'optimise',
+            'optimized': 'optimised',
+            'optimizing': 'optimising',
+            'center': 'centre',
+            'centers': 'centres',
+            'centered': 'centred',
+            'color': 'colour',
+            'colors': 'colours',
+            'colored': 'coloured',
+            'behavior': 'behaviour',
+            'behaviors': 'behaviours',
+            'favor': 'favour',
+            'favors': 'favours',
+            'favored': 'favoured',
+            'honor': 'honour',
+            'honored': 'honoured',
+            'honors': 'honours',
+            'license': 'licence',  # when used as noun
+            'inquiry': 'enquiry',
+            'inquiries': 'enquiries',
+            'apologize': 'apologise',
+            'apologized': 'apologised',
+            'apologizing': 'apologising',
+        }
+        
+        corrected = content
+        
+        # Apply word-boundary corrections for exact matches
+        import re
+        for american, british in corrections.items():
+            # Word boundary replacement
+            pattern = r'\b' + re.escape(american) + r'\b'
+            corrected = re.sub(pattern, british, corrected, flags=re.IGNORECASE)
+        
+        # Currency corrections - convert $ to R
+        corrected = re.sub(r'\$(\d+(?:,\d{3})*(?:\.\d{2})?)', r'R\1', corrected)
+        corrected = corrected.replace('USD', 'ZAR')
+        corrected = corrected.replace(' dollars', ' rand')
+        corrected = corrected.replace(' dollar', ' rand')
+        
+        return corrected
 
     async def close(self):
         """Close the HTTP client"""

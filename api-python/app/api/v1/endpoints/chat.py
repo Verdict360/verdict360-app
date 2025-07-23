@@ -314,7 +314,7 @@ async def _call_legal_ai_model(
         logger.error(f"AI service error: {str(e)}")
         # Fallback response
         return {
-            'content': f"""I apologize, but I'm experiencing technical difficulties processing your legal inquiry about "{message[:100]}...".
+            'content': f"""I apologise, but I'm experiencing technical difficulties processing your legal enquiry about "{message[:100]}...".
 
 **Please try:**
 • Rephrasing your question
