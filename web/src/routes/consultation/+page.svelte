@@ -20,22 +20,58 @@
   async function submitConsultation() {
     isSubmitting = true;
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    alert('Consultation request submitted successfully! We will contact you within 24 hours.');
-    
-    // Reset form
-    formData = {
-      name: '',
-      email: '',
-      phone: '',
-      legalArea: '',
-      urgency: 'normal',
-      description: '',
-      preferredDate: '',
-      preferredTime: ''
-    };
+    try {
+      // Call the real API endpoint
+      const response = await fetch('/api/v1/consultation/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_name: formData.name,
+          client_email: formData.email,
+          client_phone: formData.phone,
+          legal_area: formData.legalArea,
+          urgency_level: formData.urgency,
+          legal_matter_description: formData.description,
+          preferred_date: formData.preferredDate,
+          preferred_time: formData.preferredTime
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Show success message with consultation details
+        alert(`Consultation request submitted successfully! 
+        
+Consultation ID: ${result.consultation_id}
+Estimated Cost: ${result.cost_breakdown?.total_cost ? 'R' + result.cost_breakdown.total_cost.toFixed(2) : 'R850'}
+Matched Attorney: ${result.attorney_match?.name || 'TBC'}
+
+We will contact you within 24 hours to confirm your appointment.`);
+        
+        // Reset form on success
+        formData = {
+          name: '',
+          email: '',
+          phone: '',
+          legalArea: '',
+          urgency: 'normal',
+          description: '',
+          preferredDate: '',
+          preferredTime: ''
+        };
+      } else {
+        // Handle API errors
+        const errorData = await response.json();
+        alert(`Consultation request failed: ${errorData.detail || 'Please try again later.'}`);
+      }
+    } catch (error) {
+      // Handle network errors
+      console.error('Consultation submission error:', error);
+      alert('Unable to submit consultation request. Please check your connection and try again.');
+    }
     
     isSubmitting = false;
   }
