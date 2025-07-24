@@ -4,7 +4,7 @@
   "description": "AI Legal Chatbot Platform for South African Law Firms",
   "type": "module",
   "scripts": {
-    "dev": "vite dev --open",
+    "dev": "vite dev --host 0.0.0.0 --port 5173",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
