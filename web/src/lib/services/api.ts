@@ -48,11 +48,31 @@ export class APIService {
     });
   }
 
-  // Voice call initiation
-  async initiateVoiceCall(phoneNumber: string) {
+  // Voice call endpoints - matches backend
+  async initiateVoiceCall(callData: {
+    consultation_id?: string;
+    client_phone: string;
+    legal_context: any;
+    call_type: string;
+  }) {
     return this.request('/voice/initiate-call', {
       method: 'POST',
-      body: JSON.stringify({ phone_number: phoneNumber })
+      body: JSON.stringify(callData)
+    });
+  }
+
+  async getVoiceCall(callId: string) {
+    return this.request(`/voice/calls/${callId}`);
+  }
+
+  async getVoiceTranscript(callId: string) {
+    return this.request(`/voice/transcripts/${callId}`);
+  }
+
+  async endVoiceCall(callId: string) {
+    return this.request('/voice/end-call', {
+      method: 'POST',
+      body: JSON.stringify({ call_id: callId })
     });
   }
 
@@ -73,9 +93,71 @@ export class APIService {
     return this.request(endpoint);
   }
 
-  // Calendar integration
-  async getAvailableSlots(date: string) {
-    return this.request(`/calendar/available-slots?date=${date}`);
+  // Dashboard analytics - matches backend endpoints
+  async getDashboardSummary(period: string = '30d') {
+    return this.request(`/analytics/dashboard/summary?period=${period}`);
+  }
+
+  async getTrendingKeywords(limit: number = 10) {
+    return this.request(`/analytics/keywords/trending?limit=${limit}`);
+  }
+
+  async getPerformanceMetrics(period: string = '30d') {
+    return this.request(`/analytics/performance/metrics?period=${period}`);
+  }
+
+  async getLegalAreaBreakdown(period: string = '30d') {
+    return this.request(`/analytics/legal-areas/breakdown?period=${period}`);
+  }
+
+  async getConversationAnalytics(limit: number = 50) {
+    return this.request(`/analytics/conversations/recent?limit=${limit}`);
+  }
+
+  async getConversionFunnel(period: string = '30d') {
+    return this.request(`/analytics/conversion/funnel?period=${period}`);
+  }
+
+  // Calendar integration - matches backend endpoints
+  async checkAvailability(availabilityData: {
+    legal_area: string;
+    preferred_date: string;
+    preferred_time?: string;
+    duration_minutes?: number;
+    urgency_level?: string;
+  }) {
+    return this.request('/calendar/availability/check', {
+      method: 'POST',
+      body: JSON.stringify(availabilityData)
+    });
+  }
+
+  async bookConsultationSlot(bookingData: {
+    client_name: string;
+    client_email: string;
+    client_phone?: string;
+    legal_area: string;
+    matter_description: string;
+    preferred_date: string;
+    preferred_time: string;
+    duration_minutes?: number;
+    urgency_level?: string;
+  }) {
+    return this.request('/calendar/consultations/book', {
+      method: 'POST',
+      body: JSON.stringify(bookingData)
+    });
+  }
+
+  async getDailySchedule(date: string, lawyerId?: string) {
+    const endpoint = lawyerId 
+      ? `/calendar/schedule/daily?date=${date}&lawyer_id=${lawyerId}`
+      : `/calendar/schedule/daily?date=${date}`;
+    return this.request(endpoint);
+  }
+
+  async getAvailableLawyers(legalArea: string) {
+    return this.request(`/calendar/availability/lawyers?legal_area=${legalArea}`);
   }
 
   // Health check
