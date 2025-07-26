@@ -36,7 +36,7 @@
       <div class="max-w-4xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Chat Interface -->
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-2 h-[calc(100vh-12rem)]">
             <ChatWidget />
           </div>
           

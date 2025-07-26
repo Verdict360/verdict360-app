@@ -117,7 +117,7 @@
   }
 </script>
 
-<Card class={isEmbedded ? 'h-96 flex flex-col' : 'h-full max-h-screen flex flex-col'}>
+<Card class="h-full flex flex-col">
   <!-- Header -->
   <div class="flex items-center justify-between p-4 border-b border-legal-gray-200">
     <div class="flex items-center space-x-3">
