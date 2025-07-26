@@ -10,7 +10,7 @@ import logging
 import uuid
 from datetime import datetime
 
-from app.services.ollama_ai_service import ollama_ai_service
+from app.services.demo_ai_service import demo_ai_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -40,8 +40,8 @@ async def simple_chat(request: SimpleChatRequest):
         
         logger.info(f"Processing simple chat message: {request.message[:50]}...")
         
-        # Get AI response from Ollama (real AI)
-        ai_response = await ollama_ai_service.generate_response(
+        # Get AI response from Demo AI (client-acquisition focused)
+        ai_response = await demo_ai_service.generate_response(
             message=request.message,
             context=[],
             conversation_history="",

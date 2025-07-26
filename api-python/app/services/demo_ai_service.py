@@ -148,51 +148,61 @@ Would you like information about specific aspects of property law or assistance 
             }
         }
         
-        # Default responses for general inquiries
+        # Client-acquisition focused responses for general inquiries
         self.general_responses = [
-            """Thank you for your legal inquiry. I'm here to provide general guidance on South African law.
+            """Hello! Welcome to our legal assistant. I'm here to help you understand your legal situation and connect you with our experienced attorneys.
 
-Based on your question, I recommend:
+Based on your enquiry, here's how we can assist:
 
-1. **Immediate Action:** Gather all relevant documentation related to your legal matter
-2. **Professional Consultation:** Schedule a consultation with a qualified South African attorney who specializes in your area of legal need
-3. **Know Your Rights:** Understand your constitutional and legal rights under South African law
-4. **Time Sensitivity:** Be aware of any statutory time limits that may apply to your situation
+**📞 Immediate Help Available:**
+• **Free 15-minute consultation** to assess your case
+• **Same-day appointments** for urgent matters
+• **Experienced attorneys** specialising in South African law
+• **No-obligation case evaluation**
 
-**Important Legal Resources:**
-• South African Law Reform Commission
-• Legal Aid South Africa (for qualifying individuals)
-• Provincial Law Societies for attorney referrals
-• Constitutional Court and Supreme Court of Appeal judgments
+**🏛️ Our Legal Expertise:**
+• Criminal Defence & Bail Applications
+• Family Law & Divorce Proceedings  
+• Commercial Contracts & Business Law
+• Property Transfers & Conveyancing
+• Employment Law & CCMA Disputes
 
-*This information is for general guidance only. For specific legal advice tailored to your situation, please consult with a qualified attorney.*
+**⭐ Why Choose Our Firm:**
+• 95% success rate in similar cases
+• Over 20 years combined experience
+• Affordable payment plans available
+• Qualified attorneys admitted to practice
 
-Would you like me to provide more specific information about any particular area of South African law?""",
+Our legal team is standing by to review your specific situation and provide professional guidance tailored to your needs.
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]""",
             
-            """I understand you're seeking legal guidance. Let me provide some general information about South African law that may be helpful.
+            """Thank you for reaching out! I can see you need legal guidance, and you've come to the right place.
 
-**South African Legal System:**
-• Based on Roman-Dutch law with English law influences
-• Constitutional supremacy under the 1996 Constitution
-• Courts hierarchy from Magistrates' Courts to Constitutional Court
-• Both civil and criminal law jurisdictions
+**🎯 How Our Attorneys Can Help You:**
 
-**Getting Legal Help:**
-1. Identify the specific area of law involved in your matter
-2. Consult the relevant professional body or law society
-3. Consider Legal Aid if you qualify for assistance
-4. Prepare all relevant documentation before your consultation
+**Immediate Assessment:**
+Our qualified legal team will review your situation and provide clear guidance on your rights and options under South African law.
 
-**Your Constitutional Rights:**
-All South Africans have fundamental rights protected by the Constitution, including:
-• Right to equality and dignity
-• Right to access to courts and legal representation
-• Right to administrative justice
-• Right to property protection
+**Proven Track Record:**
+• **500+ successful cases** resolved
+• **Admitted attorneys** with High Court representation rights  
+• **Specialised expertise** in all major legal areas
+• **Client satisfaction rate:** 98%
 
-*Remember: While I can provide general information, specific legal matters require professional legal advice from qualified practitioners.*
+**What Makes Us Different:**
+✅ **Free initial consultation** - No upfront cost to discuss your case
+✅ **Same-day response** - We understand legal matters are urgent
+✅ **Payment plans available** - Quality legal help shouldn't break the bank
+✅ **24/7 emergency support** - For critical legal situations
 
-Is there a specific area of South African law you'd like to know more about?"""
+**🏛️ South African Legal Expertise:**
+Our attorneys have deep knowledge of SA law including the Constitution, Labour Relations Act, Criminal Procedure Act, and all provincial legislation.
+
+**Next Steps:**
+Let our experienced legal team assess your specific situation and explain your options. Many clients are surprised to learn they have more rights and remedies available than they initially thought.
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]"""
         ]
 
     async def generate_response(
@@ -226,6 +236,17 @@ Is there a specific area of South African law you'd like to know more about?"""
                     'legal_area': 'Emergency Legal Matter',
                     'urgency': 'Critical',
                     'confidence': 0.90,
+                    'sources': [],
+                    'legal_citations': []
+                }
+            
+            # Greetings and initial contact
+            if any(word in message_lower for word in ['hi', 'hello', 'hey', 'good morning', 'good afternoon']):
+                return {
+                    'content': self._get_greeting_response(),
+                    'legal_area': 'Initial Contact',
+                    'urgency': 'Normal', 
+                    'confidence': 0.95,
                     'sources': [],
                     'legal_citations': []
                 }
@@ -287,6 +308,33 @@ You have the right to legal representation and to remain silent until you have l
 *This is an emergency protocol response. For specific legal advice, contact a qualified attorney immediately.*
 
 Would you like help finding emergency legal representation in your area?"""
+
+    def _get_greeting_response(self) -> str:
+        return """Hello! Welcome to our legal practice. I'm here to help you with any legal questions or concerns you might have.
+
+**🤝 How Can We Assist You Today?**
+
+Whether you're dealing with:
+• **Criminal charges** or police matters
+• **Family issues** like divorce or custody  
+• **Employment problems** or workplace disputes
+• **Property matters** or contract issues
+• **Any other legal concern**
+
+Our experienced attorneys are ready to provide professional guidance tailored to your specific situation.
+
+**✨ What to Expect:**
+• **Free consultation** to discuss your case
+• **Clear explanation** of your legal rights and options  
+• **Honest assessment** of your situation
+• **Practical next steps** to resolve your matter
+
+**📞 Ready to Get Started?**
+You can schedule a consultation or contact our legal team directly. We're here to help you navigate through any legal challenges you're facing.
+
+What type of legal matter would you like to discuss?
+
+[SCHEDULE_CONSULTATION] [CONTACT_FIRM]"""
 
     def _get_consultation_response(self) -> str:
         return """I'd be happy to help you schedule a legal consultation.
