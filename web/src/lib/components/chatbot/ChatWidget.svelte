@@ -119,7 +119,7 @@
 
 <Card class="h-full flex flex-col">
   <!-- Header -->
-  <div class="flex items-center justify-between p-4 border-b border-legal-gray-200">
+  <div class="flex items-center justify-between p-4 border-b border-legal-gray-200 flex-shrink-0">
     <div class="flex items-center space-x-3">
       <div class="w-8 h-8 bg-legal-primary rounded-full flex items-center justify-center">
         <span class="text-white font-semibold text-sm">V</span>
@@ -162,7 +162,7 @@
   </div>
   
   <!-- Input -->
-  <div class="p-4 border-t border-legal-gray-200">
+  <div class="p-4 border-t border-legal-gray-200 flex-shrink-0">
     <div class="flex space-x-2">
       <textarea
         bind:value={currentMessage}
@@ -184,7 +184,7 @@
       </Button>
     </div>
     
-    <p class="text-xs text-legal-gray-400 mt-2">
+    <p class="text-xs text-legal-gray-400 mt-2 leading-relaxed">
       Press Enter to send, Shift+Enter for new line
     </p>
   </div>
