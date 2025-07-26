@@ -23,6 +23,8 @@
   let recognition: any = null;
   let speechSynthesis: any = null;
   let currentUtterance: any = null;
+  let autoListenTimeout: any = null;
+  let silenceTimeout: any = null;
   
   // Create enhanced error message with contact information
   function createErrorMessage(userMessage: string = '') {
@@ -81,24 +83,52 @@
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.continuous = true; // Keep listening
+        recognition.interimResults = true; // Show interim results
         recognition.lang = 'en-ZA'; // South African English
         
         recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          currentMessage = transcript;
-          isListening = false;
-          // Automatically send the voice message
-          setTimeout(() => sendMessage(), 500);
+          let finalTranscript = '';
+          let interimTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+          
+          if (finalTranscript) {
+            currentMessage = finalTranscript.trim();
+            // Clear any existing silence timeout
+            if (silenceTimeout) {
+              clearTimeout(silenceTimeout);
+            }
+            // Stop listening and send message
+            stopListening();
+            setTimeout(() => sendMessage(), 300);
+          } else {
+            // Show interim results
+            currentMessage = interimTranscript.trim();
+          }
         };
         
-        recognition.onerror = () => {
-          isListening = false;
+        recognition.onerror = (event: any) => {
+          console.log('Speech recognition error:', event.error);
+          if (isCallActive && event.error !== 'no-speech') {
+            // Restart listening after error (except for no-speech)
+            setTimeout(() => startListening(), 1000);
+          }
         };
         
         recognition.onend = () => {
           isListening = false;
+          // If call is still active and we're not speaking, restart listening
+          if (isCallActive && !isSpeaking) {
+            setTimeout(() => startListening(), 500);
+          }
         };
       }
       
@@ -134,6 +164,10 @@
     isListening = false;
     isSpeaking = false;
     
+    // Clear any timeouts
+    if (autoListenTimeout) clearTimeout(autoListenTimeout);
+    if (silenceTimeout) clearTimeout(silenceTimeout);
+    
     if (recognition) {
       recognition.stop();
     }
@@ -144,21 +178,28 @@
     }
   }
 
-  function toggleListening() {
-    if (!recognition) {
-      initializeVoice();
+  function startListening() {
+    if (!recognition || !isCallActive) return;
+    
+    if (isSpeaking) {
+      // Wait for speaking to finish
+      setTimeout(() => startListening(), 500);
+      return;
     }
     
-    if (isListening) {
-      recognition.stop();
-      isListening = false;
-    } else {
-      if (isSpeaking) {
-        speechSynthesis.cancel();
-        isSpeaking = false;
-      }
-      recognition.start();
+    try {
       isListening = true;
+      recognition.start();
+    } catch (error) {
+      console.log('Recognition start error:', error);
+      isListening = false;
+    }
+  }
+
+  function stopListening() {
+    if (recognition && isListening) {
+      isListening = false;
+      recognition.stop();
     }
   }
 
@@ -203,11 +244,25 @@
       currentUtterance.onend = () => {
         isSpeaking = false;
         currentUtterance = null;
+        
+        // Automatically start listening after AI finishes speaking (if in call)
+        if (isCallActive) {
+          autoListenTimeout = setTimeout(() => {
+            startListening();
+          }, 1000); // Give 1 second pause after AI stops speaking
+        }
       };
       
       currentUtterance.onerror = () => {
         isSpeaking = false;
         currentUtterance = null;
+        
+        // Start listening even after speech error
+        if (isCallActive) {
+          autoListenTimeout = setTimeout(() => {
+            startListening();
+          }, 1000);
+        }
       };
       
       speechSynthesis.speak(currentUtterance);
@@ -330,41 +385,48 @@
   <!-- Input -->
   <div class="p-4 border-t border-legal-gray-200 flex-shrink-0">
     {#if isCallActive}
-      <!-- Voice Call Controls -->
-      <div class="text-center space-y-3">
-        <div class="bg-legal-success/10 border border-legal-success/20 rounded-legal p-3">
-          <div class="flex items-center justify-center space-x-2 mb-2">
-            <div class="w-2 h-2 bg-legal-success rounded-full animate-pulse"></div>
-            <span class="text-sm font-medium text-legal-success">Call Active</span>
+      <!-- Voice Call Interface -->
+      <div class="text-center space-y-4">
+        <div class="bg-legal-success/10 border border-legal-success/20 rounded-legal p-4">
+          <div class="flex items-center justify-center space-x-2 mb-3">
+            <div class="w-3 h-3 bg-legal-success rounded-full animate-pulse"></div>
+            <span class="text-sm font-semibold text-legal-success">Voice Call Active</span>
           </div>
           
           {#if isSpeaking}
-            <p class="text-xs text-legal-gray-600">AI is speaking...</p>
+            <div class="flex items-center justify-center space-x-2">
+              <div class="flex space-x-1">
+                <div class="w-2 h-6 bg-legal-primary rounded-full animate-pulse"></div>
+                <div class="w-2 h-4 bg-legal-primary rounded-full animate-pulse" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-8 bg-legal-primary rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-3 bg-legal-primary rounded-full animate-pulse" style="animation-delay: 0.3s"></div>
+                <div class="w-2 h-6 bg-legal-primary rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+              </div>
+            </div>
+            <p class="text-sm text-legal-gray-700 mt-2">AI Assistant is speaking...</p>
           {:else if isListening}
-            <p class="text-xs text-legal-gray-600">Listening... speak now</p>
+            <div class="flex items-center justify-center space-x-2">
+              <Mic class="h-5 w-5 text-legal-primary animate-pulse" />
+              <div class="flex space-x-1">
+                <div class="w-2 h-4 bg-legal-accent rounded-full animate-bounce"></div>
+                <div class="w-2 h-6 bg-legal-accent rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-4 bg-legal-accent rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+              </div>
+            </div>
+            <p class="text-sm text-legal-gray-700 mt-2">Listening... please speak</p>
+            {#if currentMessage}
+              <p class="text-xs text-legal-gray-500 mt-1 italic">"{currentMessage}"</p>
+            {/if}
           {:else}
-            <p class="text-xs text-legal-gray-600">Press the microphone to speak</p>
+            <div class="flex items-center justify-center">
+              <Phone class="h-5 w-5 text-legal-primary" />
+            </div>
+            <p class="text-sm text-legal-gray-700 mt-2">Ready for your question</p>
           {/if}
         </div>
         
-        <div class="flex justify-center space-x-4">
-          <Button 
-            variant={isListening ? "destructive" : "primary"}
-            size="lg"
-            class="rounded-full w-16 h-16 flex items-center justify-center"
-            on:click={toggleListening}
-            disabled={isSpeaking}
-          >
-            {#if isListening}
-              <MicOff class="h-6 w-6" />
-            {:else}
-              <Mic class="h-6 w-6" />
-            {/if}
-          </Button>
-        </div>
-        
-        <p class="text-xs text-legal-gray-400">
-          Tap microphone to speak your legal question
+        <p class="text-xs text-legal-gray-500 leading-relaxed">
+          Speak naturally - the AI will automatically listen after responding
         </p>
       </div>
     {:else}
