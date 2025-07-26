@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 class OllamaAIService:
     """AI service using local Ollama instance for legal responses"""
     
-    def __init__(self, model_name: str = "llama3.2:latest", base_url: str = "http://localhost:11434"):
+    def __init__(self, model_name: str = "llama3.2:latest", base_url: str = None):
+        import os
+        if base_url is None:
+            base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.model_name = model_name
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=120.0)  # 2 minute timeout for AI responses

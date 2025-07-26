@@ -31,6 +31,7 @@ services:
       - MINIO_PORT=9000
       - REDIS_URL=redis://redis:6379
       - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
     depends_on:
       postgres:
         condition: service_healthy

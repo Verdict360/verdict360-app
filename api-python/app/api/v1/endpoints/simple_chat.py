@@ -61,7 +61,11 @@ async def simple_chat(request: SimpleChatRequest):
         logger.error(f"Simple chat error: {str(e)}")
         
         # Check if it's specifically an Ollama connection issue
-        if "Connection" in str(e) or "timeout" in str(e).lower() or "refused" in str(e).lower():
+        error_str = str(e).lower()
+        if any(error_indicator in error_str for error_indicator in [
+            "connection", "timeout", "refused", "failed", "unreachable", 
+            "attempts failed", "cannot connect", "network", "host"
+        ]):
             logger.warning("Ollama service appears to be unavailable, falling back to demo responses")
             # Import demo service as fallback
             from app.services.demo_ai_service import demo_ai_service
