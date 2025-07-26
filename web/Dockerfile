@@ -16,8 +16,8 @@ EXPOSE 5173
 ENV NODE_ENV=development
 ENV VITE_API_URL=http://localhost:8000
 
-# Start development server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Start development server with auto-open
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--open"]
 
 # Production stage
 FROM node:18-alpine as build

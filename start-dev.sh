@@ -1,5 +1,28 @@
 #!/bin/bash
 
+# Function to open browser
+open_browser() {
+    local url=$1
+    echo "🌐 Opening $url in default browser..."
+    
+    # Wait a moment for the server to be ready
+    sleep 3
+    
+    # Cross-platform browser opening
+    if command -v open > /dev/null 2>&1; then
+        # macOS
+        open "$url"
+    elif command -v xdg-open > /dev/null 2>&1; then
+        # Linux
+        xdg-open "$url"
+    elif command -v start > /dev/null 2>&1; then
+        # Windows
+        start "$url"
+    else
+        echo "Please manually open: $url"
+    fi
+}
+
 echo "🚀 Starting Legal Chatbot Platform Development Environment"
 echo "=========================================================="
 
@@ -75,6 +98,27 @@ echo "📝 Logs:"
 echo "- View all logs: docker-compose logs -f"
 echo "- View backend logs: docker-compose logs -f api-python"
 echo "- View frontend logs: docker-compose logs -f web"
+
 echo ""
+echo "🌐 Starting frontend in browser..."
+
+# Open browser in background after a short delay
+(sleep 8 && open_browser "http://localhost:5173") &
+
 echo "✅ Development environment ready!"
+echo ""
+echo "🎯 Access URLs:"
+echo "- 🏠 Legal Chatbot Frontend: http://localhost:5173 (opening automatically)"
+echo "- 🔧 FastAPI Backend: http://localhost:8000"
+echo "- 📚 API Documentation: http://localhost:8000/docs"
+echo "- 🔐 Keycloak Admin: http://localhost:8080 (admin/admin)"
+echo "- 📦 MinIO Console: http://localhost:9001 (minioadmin/minioadmin)"
+echo "- 🔄 N8N Workflows: http://localhost:5678 (admin/admin123)"
+echo ""
+echo "📝 Quick Commands:"
+echo "- View all logs: docker-compose logs -f"
+echo "- View backend logs: docker-compose logs -f api-python"
+echo "- View frontend logs: docker-compose logs -f web"
+echo "- Local frontend dev: cd web && npm run dev"
+echo ""
 echo "📖 Check PROJECT_STRUCTURE.md for architecture details"
