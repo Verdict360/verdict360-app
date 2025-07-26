@@ -117,7 +117,7 @@
   }
 </script>
 
-<Card class="h-full flex flex-col">
+<Card class="h-[96%] flex flex-col">
   <!-- Header -->
   <div class="flex items-center justify-between p-4 border-b border-legal-gray-200 flex-shrink-0">
     <div class="flex items-center space-x-3">
