@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     logger.info("🇿🇦 Configured for South African legal context")
     
     try:
-        # Initialize vector store
+        # Initialize vector store (optional for basic API functionality)
         vector_store = VectorStoreService()
         await vector_store.initialize()
         
@@ -53,8 +53,13 @@ async def lifespan(app: FastAPI):
         logger.info(f"📊 Collection: {settings.CHROMA_COLLECTION_NAME}")
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize vector store: {e}")
-        raise
+        logger.warning(f"⚠️ Vector store initialization failed: {e}")
+        logger.info("🔄 Starting API without vector store (simple chat will still work)")
+        
+        # Set None for vector store to allow basic functionality
+        app.state.vector_store = None
+        set_vector_store(None)
+        set_chat_vector_store(None)
     
     yield
     
